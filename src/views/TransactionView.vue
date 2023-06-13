@@ -4,14 +4,20 @@ import { onMounted } from "vue";
 import { ref, type Ref } from "vue";
 import type { Client, AccountTxResponse, TransactionMetadata, Payment, NFTokenAcceptOffer, NFTokenMint, TrustSet, AccountSet, NFTokenCreateOffer } from "xrpl";
 import type { Transaction } from "xrpl";
+import transactionTable from "./transactionTable.vue";
+
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
 const tab = ref(null)
-const account: string = "rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9";
+
+const urlParams = new URLSearchParams(window.location.search);
+const account = urlParams.get("account") || "rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9";
+
 const paymentsList: Ref<TransactionInfo[]> = ref([]);
-
-
-type TransactionInfo = {
+const paymentsSentList: Ref<TransactionInfo[]> = ref([]);
+const paymentsReceivedList: Ref<TransactionInfo[]> = ref([]);
+const paymentsGroupedMap: Ref<Map<string, TransactionInfo[]>> = ref(new Map());
+export type TransactionInfo = {
   tx_type: string;
   direction: string;
   amount: number;
@@ -22,6 +28,18 @@ type TransactionInfo = {
   hash: string;
   txAddress: string;
 };
+
+function groupBy(txList: TransactionInfo[], getKey: (item: TransactionInfo) => string): Map<string, TransactionInfo[]> {
+  return txList.reduce((groupedItems: Map<string, TransactionInfo[]>, currentItem: TransactionInfo) => {
+    const key = getKey(currentItem);
+    if (!groupedItems.has(key)) {
+      groupedItems.set(key, []);
+    }
+    groupedItems.get(key)!.push(currentItem);
+    return groupedItems;
+  }, new Map<string, TransactionInfo[]>());
+}
+
 
 function getDate(tx: Transaction) {
   const dateInt = new Map(Object.entries(tx)).get("date") as number | undefined;
@@ -45,7 +63,7 @@ function getHash(tx: Transaction) {
 function getPaymentInfo(tx: Transaction, account: string) {
   const paymentTransaction = tx as Payment;
   const sent = paymentTransaction.Destination === account;
-  const direction = sent ? "sent" : "received";
+  const direction = !sent ? "sent" : "received";
   let amount = 0;
   let currency = "XRP";
   const txAddress = sent
@@ -169,6 +187,15 @@ async function precessTransactions() {
   client.disconnect();
   paymentsList.value = paymentsTxInfoList;
 
+  paymentsSentList.value = paymentsTxInfoList.filter(
+    (tx) => tx.direction === "sent"
+  );
+  paymentsReceivedList.value = paymentsTxInfoList.filter(
+    (tx) => tx.direction === "received"
+  );
+  paymentsGroupedMap.value = groupBy(paymentsTxInfoList, (tx) => tx.txAddress);
+
+
   return;
 }
 
@@ -183,35 +210,49 @@ onMounted(precessTransactions)
         <h3>Raw Transactions</h3>
       </v-tab>
       <v-tab value="two">
+        <h3>Sent Transactions</h3>
+      </v-tab>
+      <v-tab value="three">
+        <h3>received Transactions</h3>
+      </v-tab>
+      <v-tab value="four">
         <h3>Grouped Transactions</h3>
       </v-tab>
     </v-tabs>
 
     <!-- Raw transactions -->
     <div v-if="tab === 'one'">
-      <v-table width="100%" height="600px">
-        <thead>
-          <tr>
-            <th class="text-left">Date</th>
-            <th class="text-left">Amount</th>
-            <th class="text-left">Currency</th>
-            <th class="text-left">Direction</th>
-            <th class="text-left">tx Type</th>
-            <th class="text-left">tx Address</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in paymentsList" :key="index">
-            <td>{{ item.date }}</td>
-            <td>{{ item.amount }}</td>
-            <td>{{ item.currency }}</td>
-            <td>{{ item.direction }}</td>
-            <td>{{ item.tx_type }}</td>
-            <td>{{ item.txAddress }}</td>
-          </tr>
-        </tbody>
-      </v-table>
+      <transactionTable :txList="paymentsList" />
+    </div>
+    <div v-if="tab === 'two'">
+      <transactionTable :txList="paymentsSentList" />
+    </div>
+    <div v-if="tab === 'three'">
+      <transactionTable :txList="paymentsReceivedList" />
+    </div>
+    <div v-if="tab === 'four'">
+      <tr v-for="(item, index) in paymentsGroupedMap" :key="index">
+        <div>
 
+          <v-expansion-panels>
+            <v-expansion-panel :title="item[0]">
+              <v-expansion-panel-text>
+                <v-card class="pa-5 mt-3">
+                  <transactionTable :txList="item[1]" />
+
+                </v-card>
+              </v-expansion-panel-text>
+
+            </v-expansion-panel>
+          </v-expansion-panels>
+
+
+
+
+
+        </div>
+
+      </tr>
 
     </div>
   </div>
