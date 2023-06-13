@@ -9,6 +9,11 @@ import transactionTable from "./transactionTable.vue";
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
 const tab = ref(null)
+const accountTypes = ["Exchange(AUD)", "3rd Party", "Owned Account"]
+const whoAccount: Ref<string[]> = ref([]);
+
+
+
 
 const urlParams = new URLSearchParams(window.location.search);
 const account = urlParams.get("account") || "rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9";
@@ -167,7 +172,11 @@ async function precessTransactions() {
 
     if (tx.TransactionType === "Payment") {
       const txInfo = getPaymentInfo(tx, account);
-      paymentsTxInfoList.push(txInfo);
+      if (txInfo.currency === "XRP") {
+        paymentsTxInfoList.push(txInfo);
+      } else {
+        // todo: add logic for non-xrp payments
+      }
     } else if (
       tx.TransactionType === "NFTokenMint" ||
       tx.TransactionType === "AccountSet" ||
@@ -193,13 +202,73 @@ async function precessTransactions() {
   paymentsReceivedList.value = paymentsTxInfoList.filter(
     (tx) => tx.direction === "received"
   );
-  paymentsGroupedMap.value = groupBy(paymentsTxInfoList, (tx) => tx.txAddress);
+  paymentsGroupedMap.value = groupBy(paymentsTxInfoList, (tx) => {
+    whoAccount.value.concat("data")
+    return tx.txAddress
+  });
 
 
   return;
 }
 
-onMounted(precessTransactions)
+// onMounted(precessTransactions)
+
+precessTransactions()
+
+const deposits: Ref<TransactionInfo[]> = ref([])
+const withdraws: Ref<TransactionInfo[]> = ref([])
+const incomings: Ref<TransactionInfo[]> = ref([])
+const outgoings: Ref<TransactionInfo[]> = ref([])
+
+const depositsSum: Ref<number> = ref(0)
+const withdrawsSum: Ref<number> = ref(0)
+const incomingsSum: Ref<number> = ref(0)
+const outgoingsSum: Ref<number> = ref(0)
+const fees: Ref<number> = ref(0)
+
+function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
+  deposits.value = []
+  withdraws.value = []
+  incomings.value = []
+  outgoings.value = []
+  depositsSum.value = 0
+  withdrawsSum.value = 0
+  incomingsSum.value = 0
+  outgoingsSum.value = 0
+
+  const paymentGroupedKeys = paymentGrouped.keys()
+  let index = 0
+  for (const address of paymentGroupedKeys) {
+    address as string;
+    const txInfoList = paymentGrouped.get(address) ?? []
+    for (const txInfo of txInfoList) {
+      fees.value += txInfo.fee
+      if (whoAccount.value[index] == "Exchange(AUD)") {
+        if (txInfo.direction === "sent") {
+          // sent
+          withdraws.value.concat(txInfo)
+          withdrawsSum.value += txInfo.amount
+        } else {
+          // received
+          deposits.value.concat(txInfo)
+          depositsSum.value += txInfo.amount
+        }
+      } else if (whoAccount.value[index] == "3rd Party" || whoAccount.value[index] == "Expense") {
+        if (txInfo.direction === "sent") {
+          // sent
+          outgoings.value.concat(txInfo)
+          outgoingsSum.value += txInfo.amount
+        } else {
+          // received
+          incomings.value.concat(txInfo)
+          incomingsSum.value += txInfo.amount
+        }
+      }
+    }
+    index += 1
+  }
+
+}
 
 </script>
 
@@ -236,13 +305,17 @@ onMounted(precessTransactions)
 
           <v-expansion-panels>
             <v-expansion-panel :title="item[0]">
-              <v-expansion-panel-text>
-                <v-card class="pa-5 mt-3">
-                  <transactionTable :txList="item[1]" />
+              <div>
+                <v-select density="compact" label="Select Account Type" v-model="whoAccount[index]"
+                  :items="accountTypes"></v-select>
+                <v-expansion-panel-text>
+                  <v-card class="pa-5 mt-3">
+                    <transactionTable :txList="item[1]" />
 
-                </v-card>
-              </v-expansion-panel-text>
+                  </v-card>
+                </v-expansion-panel-text>
 
+              </div>
             </v-expansion-panel>
           </v-expansion-panels>
 
@@ -253,6 +326,14 @@ onMounted(precessTransactions)
         </div>
 
       </tr>
+
+      <v-btn tonal block @click="calculate(paymentsGroupedMap)">CALCULATE</v-btn>
+
+      <div>Deposit Crypto: {{ depositsSum }}</div>
+      <div>Withdraw Crypto: {{ withdrawsSum }}</div>
+      <div>Incomings: {{ incomingsSum }}</div>
+      <div>Outgoings: {{ outgoingsSum }}</div>
+      <div>Fees {{ fees }}</div>
 
     </div>
   </div>
