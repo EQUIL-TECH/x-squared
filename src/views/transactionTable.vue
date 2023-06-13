@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from "vue";
 import type { TransactionInfo } from "./TransactionView.vue";
-
+import AccountComponent from "./accountComponent.vue"
 
 defineProps<{
     txList: TransactionInfo[];
@@ -28,7 +28,10 @@ defineProps<{
                 <td>{{ item.currency }}</td>
                 <td>{{ item.direction }}</td>
                 <td>{{ item.tx_type }}</td>
-                <td>{{ item.txAddress }}</td>
+                <td>
+                    <!-- {{ item.txAddress }} -->
+                    <AccountComponent :account="item.txAddress" :userAccount="'?'"></AccountComponent>
+                </td>
             </tr>
         </tbody>
     </v-table>
