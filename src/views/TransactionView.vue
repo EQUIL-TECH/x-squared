@@ -9,7 +9,7 @@ import transactionTable from "./transactionTable.vue";
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
 const tab = ref(null)
-const accountTypes = ["Exchange(AUD)", "3rd Party", "Owned Account"]
+const accountTypes = ["Exchange(AUD)", "3rd Party"]
 const whoAccount: Ref<string[]> = ref([]);
 
 
