@@ -17,7 +17,7 @@ defineProps<{
                 <th class="text-left">Amount</th>
                 <th class="text-left">Currency</th>
                 <th class="text-left">Direction</th>
-                <th class="text-left">tx Type</th>
+                <th class="text-left">AUD rate</th>
                 <th class="text-left">tx Address</th>
             </tr>
         </thead>
@@ -27,7 +27,7 @@ defineProps<{
                 <td>{{ item.amount }}</td>
                 <td>{{ item.currency }}</td>
                 <td>{{ item.direction }}</td>
-                <td>{{ item.tx_type }}</td>
+                <td>{{ item.fiatRate }}</td>
                 <td>
                     <!-- {{ item.txAddress }} -->
                     <AccountComponent :account="item.txAddress" :userAccount="'?'"></AccountComponent>

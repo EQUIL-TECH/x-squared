@@ -5,6 +5,7 @@ import { ref, type Ref } from "vue";
 import type { Client, AccountTxResponse, TransactionMetadata, Payment, NFTokenAcceptOffer, NFTokenMint, TrustSet, AccountSet, NFTokenCreateOffer } from "xrpl";
 import type { Transaction } from "xrpl";
 import transactionTable from "./transactionTable.vue";
+import { formatDate, getHistoricalCryptoPrice } from "@/services/coingecko";
 
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
@@ -32,6 +33,7 @@ export type TransactionInfo = {
   fee: number;
   hash: string;
   txAddress: string;
+  fiatRate?: number | null;
 };
 
 function groupBy(txList: TransactionInfo[], getKey: (item: TransactionInfo) => string): Map<string, TransactionInfo[]> {
@@ -157,11 +159,12 @@ async function precessTransactions() {
   // @ts-ignore
   const client: Client = new xrpl.Client("wss://xrplcluster.com")
   await client.connect();
+
   const response: AccountTxResponse = await client.request(req);
   const transList = response.result.transactions;
   // get each ledger_index
   const paymentsTxInfoList: TransactionInfo[] = [];
-  const maybeTransactions = transList.map((trans) => {
+  for (const trans of transList) {
     const meta = trans.meta as TransactionMetadata;
     if (!trans.tx) {
       return null;
@@ -172,6 +175,9 @@ async function precessTransactions() {
 
     if (tx.TransactionType === "Payment") {
       const txInfo = getPaymentInfo(tx, account);
+      const formattedDate = formatDate(txInfo.date);
+      const price = await getHistoricalCryptoPrice(formattedDate)
+      txInfo.fiatRate = price;
       if (txInfo.currency === "XRP") {
         paymentsTxInfoList.push(txInfo);
       } else {
@@ -192,7 +198,7 @@ async function precessTransactions() {
     } else {
       // todo
     }
-  });
+  };
   client.disconnect();
   paymentsList.value = paymentsTxInfoList;
 
