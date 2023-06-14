@@ -1,5 +1,13 @@
 import axios from "axios";
 
+export function formatDate(dateString: string): string {
+  //20/03/2023, 11:27:31 am
+  const date = dateString.split(",")[0];
+  const day = date.split("/")[0];
+  const month = date.split("/")[1];
+  const year = date.split("/")[2];
+  return `${day}-${month}-${year}`;
+}
 export async function fetchConversionRate(crypto: string): Promise<number> {
   const response = await axios.get(
     "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cripple&vs_currencies=aud"
@@ -23,8 +31,8 @@ export enum Crypto {
 
 export async function getHistoricalCryptoPrice(
   date: string,
-  crypto: Crypto,
-  fiat: Fiat
+  crypto: Crypto = Crypto.Ripple,
+  fiat: Fiat = Fiat.AUD
 ): Promise<number | null> {
   const lowerCrypto = crypto.toLowerCase();
   const url = `https://api.coingecko.com/api/v3/coins/${lowerCrypto}/history?date=${date}&localization=false`;
