@@ -39,25 +39,20 @@ export async function getHistoricalCryptoPrice(
 
   console.log("url", url);
 
-  try {
-    const response = await fetch(url);
+  const response = await fetch(url);
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log("data", data);
-      if (fiat === Fiat.AUD) {
-        return data.market_data.current_price.aud;
-      } else if (fiat === Fiat.USD) {
-        return data.market_data.current_price.usd;
-      } else {
-        return null;
-      }
+  if (response.ok) {
+    const data = await response.json();
+    console.log("data", data);
+    if (fiat === Fiat.AUD) {
+      return data.market_data.current_price.aud;
+    } else if (fiat === Fiat.USD) {
+      return data.market_data.current_price.usd;
     } else {
-      console.error(`Error: ${response.status}`);
       return null;
     }
-  } catch (error) {
-    console.log(`Error: ${error}`);
+  } else {
+    console.error(`Error: ${response.status}`);
     return null;
   }
 }
