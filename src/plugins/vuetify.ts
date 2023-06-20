@@ -9,7 +9,7 @@ const Lighttheme: ThemeDefinition = {
   dark: false,
   variables: {},
   colors: {
-    primary: "#60c905",
+    primary: "#0096c7",
     info: "#7460ee",
     success: "#0acc95",
     accent: "#fc4b6c",
@@ -22,7 +22,7 @@ const Lighttheme: ThemeDefinition = {
 const Darktheme: ThemeDefinition = {
   dark: true,
   colors: {
-    primary: "#60c905",
+    primary: "#0096c7",
     info: "#7460ee",
     success: "#0acc95",
     accent: "#fc4b6c",

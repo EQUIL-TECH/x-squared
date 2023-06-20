@@ -279,68 +279,93 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
 </script>
 
 <template>
-  <div>
-    <v-tabs v-model="tab" color="primary" grow>
-      <v-tab value="one">
-        <h3>Raw Transactions</h3>
-      </v-tab>
-      <v-tab value="two">
-        <h3>Sent Transactions</h3>
-      </v-tab>
-      <v-tab value="three">
-        <h3>received Transactions</h3>
-      </v-tab>
-      <v-tab value="four">
-        <h3>Grouped Transactions</h3>
-      </v-tab>
-    </v-tabs>
+  <v-row>
+    <v-col cols="12" lg="9">
+      <div>
+        <v-tabs v-model="tab" color="primary" grow>
+          <v-tab value="one">
+            <h3>Raw Transactions</h3>
+          </v-tab>
+          <v-tab value="two">
+            <h3>Sent Transactions</h3>
+          </v-tab>
+          <v-tab value="three">
+            <h3>received Transactions</h3>
+          </v-tab>
+          <v-tab value="four">
+            <h3>Grouped Transactions</h3>
+          </v-tab>
+        </v-tabs>
 
-    <!-- Raw transactions -->
-    <div v-if="tab === 'one'">
-      <transactionTable :txList="paymentsList" />
-    </div>
-    <div v-if="tab === 'two'">
-      <transactionTable :txList="paymentsSentList" />
-    </div>
-    <div v-if="tab === 'three'">
-      <transactionTable :txList="paymentsReceivedList" />
-    </div>
-    <div v-if="tab === 'four'">
-      <tr v-for="(item, index) in paymentsGroupedMap" :key="index">
-        <div>
-
-          <v-expansion-panels>
-            <v-expansion-panel :title="item[0]">
+        <!-- Raw transactions -->
+        <div v-if="tab === 'one'">
+          <transactionTable :txList="paymentsList" />
+        </div>
+        <div v-if="tab === 'two'">
+          <transactionTable :txList="paymentsSentList" />
+        </div>
+        <div v-if="tab === 'three'">
+          <transactionTable :txList="paymentsReceivedList" />
+        </div>
+        <div v-if="tab === 'four'">
+          <v-card>
+            <h3>Un Reconciled</h3>
+            <tr v-for="(item, index) in paymentsGroupedMap" :key="index">
               <div>
-                <v-select density="compact" label="Select Account Type" v-model="whoAccount[index]"
-                  :items="accountTypes"></v-select>
-                <v-expansion-panel-text>
-                  <v-card class="pa-5 mt-3">
-                    <transactionTable :txList="item[1]" />
+                <v-expansion-panels variant="accordion">
+                  <v-expansion-panel :title="item[0]">
+                    <div>
+                      <v-select density="compact" label="Select Account Type" v-model="whoAccount[index]"
+                        :items="accountTypes"></v-select>
+                      <v-expansion-panel-text>
+                        <v-card class="pa-5 mt-3">
+                          <transactionTable :txList="item[1]" />
 
-                  </v-card>
-                </v-expansion-panel-text>
+                        </v-card>
+                      </v-expansion-panel-text>
+
+                    </div>
+                  </v-expansion-panel>
+                </v-expansion-panels>
 
               </div>
-            </v-expansion-panel>
-          </v-expansion-panels>
 
-
-
-
-
+            </tr>
+          </v-card>
         </div>
 
-      </tr>
+      </div>
+    </v-col>
+    <v-col cols="12" lg="3">
+      <v-card class="pa-5">
 
-      <v-btn tonal block @click="calculate(paymentsGroupedMap)">CALCULATE</v-btn>
+        <v-btn tonal block @click="calculate(paymentsGroupedMap)">
+          <h3>CALCULATE</h3>
+        </v-btn>
 
-      <div>Deposit Crypto: {{ depositsSum }}</div>
-      <div>Withdraw Crypto: {{ withdrawsSum }}</div>
-      <div>Incomings: {{ incomingsSum }}</div>
-      <div>Outgoings: {{ outgoingsSum }}</div>
-      <div>Fees {{ fees }}</div>
-
-    </div>
-  </div>
+        <div class="ma-3">
+          <div class="d-flex justify-space-between">
+            <p>Deposit Crypto:</p>
+            <strong>{{ depositsSum }}</strong>
+          </div>
+          <div class="d-flex justify-space-between">
+            <p>Withdraw Crypto:</p>
+            <strong>{{ withdrawsSum }}</strong>
+          </div>
+          <div class="d-flex justify-space-between">
+            <p>Incomings:</p>
+            <strong>{{ incomingsSum }}</strong>
+          </div>
+          <div class="d-flex justify-space-between">
+            <p>Outgoings:</p>
+            <strong>{{ outgoingsSum }}</strong>
+          </div>
+          <div class="d-flex justify-space-between">
+            <p>Fees:</p>
+            <strong>{{ fees }}</strong>
+          </div>
+        </div>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>

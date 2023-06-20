@@ -29,10 +29,11 @@ function persistDarkMode() {
     <!-- ---------------------------------------------- -->
     <!---Logo part -->
     <!-- ---------------------------------------------- -->
-    <!-- <div class="pa-4 pl-1 d-flex" style="width: 200px">
-      <LogoDark style="width: 100%" v-if="!customizer.darktheme && customizer.navbarColor == '#ffffff'" />
-      <LogoLight style="width: 100%" v-else />
-    </div> -->
+    <div class="pa-4 pl-1 d-flex" style="width: 200px">
+      <h2>X-SQUARED</h2>
+      <!-- <LogoDark style="width: 100%" v-if="!customizer.darktheme && customizer.navbarColor == '#ffffff'" />
+      <LogoLight style="width: 100%" v-else /> -->
+    </div>
     <!-- <v-app-bar-nav-icon class="hidden-sm-and-down" color="inherit"
       @click.stop="customizer.SET_MINI_SIDEBAR(!customizer.mini_sidebar)" />
     <v-app-bar-nav-icon class="hidden-md-and-up" color="inherit" @click.stop="customizer.SET_SIDEBAR_DRAWER" /> -->
