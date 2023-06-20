@@ -2,7 +2,7 @@ export enum accType {
   Exchange = "Exchange(AUD)",
   Client = "Client or Customer",
   Goods = "Goods or Services",
-  Owned = "Owned Account",
+  Owned = "Personal Account",
 }
 export const accountTypes: accType[] = [
   accType.Exchange,
@@ -10,3 +10,6 @@ export const accountTypes: accType[] = [
   accType.Goods,
   accType.Owned,
 ];
+
+export const depositWithDrawlTypes = [accType.Exchange, accType.Owned];
+export const incomingsOutgoingsTypes = [accType.Client, accType.Goods];
