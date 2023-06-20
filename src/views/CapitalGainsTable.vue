@@ -1,24 +1,40 @@
 <script setup lang="ts">
 import { ref, type Ref } from "vue";
-import type { TransactionAccounts, TransactionInfo } from "./TransactionView.vue";
-import AccountComponent from "./accountComponent.vue"
-
+import { accType } from "@/models/accountTypes";
+import type { AccountData } from "./TransactionView.vue";
 defineProps<{
-    txAccounts: TransactionAccounts;
+    accountDataMap: Map<string, AccountData>;
     fees: number;
 }>();
+
+
+// const depositWithDrawlTypes = ref([accType.Exchange, accType.Owned]);
+// const incomingsOutgoingsTypes = ref([accType.Client, accType.Goods,]);
 
 </script>
 
 <template>
     <h2>Transaction Table</h2>
     <h3>Deposits</h3>
-    <div>{{ txAccounts.Exchange.cryptoAmountReceived }} XRP | {{ txAccounts.Exchange.fiatAmountReceived }} AUD</div>
+    <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountReceived }} XRP | {{
+        accountDataMap.get(accType.Exchange)?.cryptoAmountReceived }} AUD</div>
+    <div>{{ accType.Owned }} | {{ accountDataMap.get(accType.Owned)?.cryptoAmountReceived }} XRP | {{
+        accountDataMap.get(accType.Owned)?.cryptoAmountReceived }} AUD</div>
     <h3>Withdraws</h3>
-    <div>{{ txAccounts.Exchange.cryptoAmountSent }} XRP | {{ txAccounts.Exchange.fiatAmountSent }} AUD</div>
+    <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountSent }} XRP | {{
+        accountDataMap.get(accType.Exchange)?.cryptoAmountSent }} AUD</div>
+    <div>{{ accType.Owned }} | {{ accountDataMap.get(accType.Owned)?.cryptoAmountSent }} XRP | {{
+        accountDataMap.get(accType.Owned)?.cryptoAmountSent }} AUD</div>
     <h3>Incomings</h3>
+    <div>{{ accType.Client }} | {{ accountDataMap.get(accType.Client)?.cryptoAmountReceived }} XRP | {{
+        accountDataMap.get(accType.Client)?.cryptoAmountReceived }} AUD</div>
+    <div>{{ accType.Goods }} | {{ accountDataMap.get(accType.Goods)?.cryptoAmountReceived }} XRP | {{
+        accountDataMap.get(accType.Goods)?.cryptoAmountReceived }} AUD</div>
     <h3>Outgoings</h3>
-
+    <div>{{ accType.Client }} | {{ accountDataMap.get(accType.Client)?.cryptoAmountSent }} XRP | {{
+        accountDataMap.get(accType.Client)?.cryptoAmountSent }} AUD</div>
+    <div>{{ accType.Goods }} | {{ accountDataMap.get(accType.Goods)?.cryptoAmountSent }} XRP | {{
+        accountDataMap.get(accType.Goods)?.cryptoAmountSent }} AUD</div>
     <!-- <v-table width="100%" height="600px">
         <thead>
             <tr>
