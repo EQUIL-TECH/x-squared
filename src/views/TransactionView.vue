@@ -5,12 +5,88 @@ import { ref, type Ref } from "vue";
 import type { Client, AccountTxResponse, TransactionMetadata, Payment, NFTokenAcceptOffer, NFTokenMint, TrustSet, AccountSet, NFTokenCreateOffer } from "xrpl";
 import type { Transaction } from "xrpl";
 import transactionTable from "./transactionTable.vue";
+import CapitalGainsTable from "./CapitalGainsTable.vue";
 import { formatDate, getHistoricalCryptoPrice } from "@/services/coingecko";
+
+
 
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
 const tab = ref(null)
-const accountTypes = ["Exchange(AUD)", "3rd Party"]
+// const accountTypes = ["Exchange(AUD)", "3rd Party"]
+const accountTypes = ["Exchange(AUD)", "Client or Customer", "Goods or Services", "Owned Account"]
+
+// enum accountTypes {
+//   Exchange = "Exchange(AUD)",
+//   Client = "Client or Customer",
+//   Goods = "Goods or Services",
+//   Owned = "Owned Account"
+// }
+
+type AccountData = {
+  accountType: string,
+  cryptoAmountSent: number,
+  cryptoAmountReceived: number,
+  fiatAmountSent: number,
+  fiatAmountReceived: number,
+  txListSent: TransactionInfo[]
+  txListReceived: TransactionInfo[]
+}
+
+export type TransactionAccounts = {
+  Exchange: AccountData,
+  Client: AccountData,
+  Goods: AccountData,
+  Owned: AccountData,
+}
+
+
+
+function resetTransactionAccounts(): TransactionAccounts {
+  return {
+    Exchange: {
+      accountType: "Exchange(AUD)",
+      cryptoAmountSent: 0,
+      cryptoAmountReceived: 0,
+      fiatAmountSent: 0,
+      fiatAmountReceived: 0,
+      txListSent: [],
+      txListReceived: []
+    },
+    Client: {
+      accountType: "Client or Customer",
+      cryptoAmountSent: 0,
+      cryptoAmountReceived: 0,
+      fiatAmountSent: 0,
+      fiatAmountReceived: 0,
+      txListSent: [],
+      txListReceived: []
+    },
+    Goods: {
+      accountType: "Goods or Services",
+      cryptoAmountSent: 0,
+      cryptoAmountReceived: 0,
+      fiatAmountSent: 0,
+      fiatAmountReceived: 0,
+      txListSent: [],
+      txListReceived: []
+    },
+    Owned: {
+      accountType: "Owned Account",
+      cryptoAmountSent: 0,
+      cryptoAmountReceived: 0,
+      fiatAmountSent: 0,
+      fiatAmountReceived: 0,
+      txListSent: [],
+      txListReceived: []
+    }
+
+  }
+}
+const txAccounts: Ref<TransactionAccounts> = ref(resetTransactionAccounts())
+
+console.log()
+
 const whoAccount: Ref<string[]> = ref([]);
 
 
@@ -22,7 +98,11 @@ const account = urlParams.get("account") || "rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9"
 const paymentsList: Ref<TransactionInfo[]> = ref([]);
 const paymentsSentList: Ref<TransactionInfo[]> = ref([]);
 const paymentsReceivedList: Ref<TransactionInfo[]> = ref([]);
+
+
 const paymentsGroupedMap: Ref<Map<string, TransactionInfo[]>> = ref(new Map());
+
+
 export type TransactionInfo = {
   tx_type: string;
   direction: string;
@@ -228,26 +308,12 @@ async function precessTransactions() {
 
 precessTransactions()
 
-const deposits: Ref<TransactionInfo[]> = ref([])
-const withdraws: Ref<TransactionInfo[]> = ref([])
-const incomings: Ref<TransactionInfo[]> = ref([])
-const outgoings: Ref<TransactionInfo[]> = ref([])
 
-const depositsSum: Ref<number> = ref(0)
-const withdrawsSum: Ref<number> = ref(0)
-const incomingsSum: Ref<number> = ref(0)
-const outgoingsSum: Ref<number> = ref(0)
-const fees: Ref<number> = ref(0)
+const fees = ref(0)
+
 
 function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
-  deposits.value = []
-  withdraws.value = []
-  incomings.value = []
-  outgoings.value = []
-  depositsSum.value = 0
-  withdrawsSum.value = 0
-  incomingsSum.value = 0
-  outgoingsSum.value = 0
+  txAccounts.value = resetTransactionAccounts()
 
   const paymentGroupedKeys = paymentGrouped.keys()
   let index = 0
@@ -256,25 +322,29 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
     const txInfoList = paymentGrouped.get(address) ?? []
     for (const txInfo of txInfoList) {
       fees.value += txInfo.fee
-      if (whoAccount.value[index] == "Exchange(AUD)") {
+      if (whoAccount.value[index] == txAccounts.value.Exchange.accountType) {
         if (txInfo.direction === "sent") {
-          // sent
-          withdraws.value.concat(txInfo)
-          withdrawsSum.value += txInfo.amount
+          txAccounts.value.Exchange.cryptoAmountSent += txInfo.amount
+          txAccounts.value.Exchange.fiatAmountSent += txInfo.fiatAmount ?? 0
         } else {
-          // received
-          deposits.value.concat(txInfo)
-          depositsSum.value += txInfo.amount
+          txAccounts.value.Exchange.cryptoAmountReceived += txInfo.amount
+          txAccounts.value.Exchange.fiatAmountReceived += txInfo.fiatAmount ?? 0
         }
-      } else if (whoAccount.value[index] == "3rd Party" || whoAccount.value[index] == "Expense") {
+      } else if (whoAccount.value[index] == txAccounts.value.Client.accountType) {
         if (txInfo.direction === "sent") {
-          // sent
-          outgoings.value.concat(txInfo)
-          outgoingsSum.value += txInfo.amount
+          txAccounts.value.Client.cryptoAmountSent += txInfo.amount
+          txAccounts.value.Client.fiatAmountSent += txInfo.fiatAmount ?? 0
         } else {
-          // received
-          incomings.value.concat(txInfo)
-          incomingsSum.value += txInfo.amount
+          txAccounts.value.Client.cryptoAmountReceived += txInfo.amount
+          txAccounts.value.Client.fiatAmountReceived += txInfo.fiatAmount ?? 0
+        }
+      } else if (whoAccount.value[index] == txAccounts.value.Goods.accountType) {
+        if (txInfo.direction === "sent") {
+          txAccounts.value.Goods.cryptoAmountSent += txInfo.amount
+          txAccounts.value.Goods.fiatAmountSent += txInfo.fiatAmount ?? 0
+        } else {
+          txAccounts.value.Goods.cryptoAmountReceived += txInfo.amount
+          txAccounts.value.Goods.fiatAmountReceived += txInfo.fiatAmount ?? 0
         }
       }
     }
@@ -342,11 +412,7 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
 
       <v-btn tonal block @click="calculate(paymentsGroupedMap)">CALCULATE</v-btn>
 
-      <div>Deposit Crypto: {{ depositsSum }}</div>
-      <div>Withdraw Crypto: {{ withdrawsSum }}</div>
-      <div>Incomings: {{ incomingsSum }}</div>
-      <div>Outgoings: {{ outgoingsSum }}</div>
-      <div>Fees {{ fees }}</div>
+      <CapitalGainsTable :txAccounts="txAccounts" :fees="fees" />
 
     </div>
   </div>
