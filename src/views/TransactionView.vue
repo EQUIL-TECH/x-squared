@@ -34,6 +34,7 @@ export type TransactionInfo = {
   hash: string;
   txAddress: string;
   fiatRate?: number | null;
+  fiatAmount?: number | null;
 };
 
 function groupBy(txList: TransactionInfo[], getKey: (item: TransactionInfo) => string): Map<string, TransactionInfo[]> {
@@ -177,7 +178,13 @@ async function precessTransactions() {
       const txInfo = getPaymentInfo(tx, account);
       const formattedDate = formatDate(txInfo.date);
       const price = await getHistoricalCryptoPrice(formattedDate)
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
       txInfo.fiatRate = price;
+      if (price) {
+        const roundedAmount = Math.round(price * txInfo.amount * 100) / 100;
+
+        txInfo.fiatAmount = roundedAmount;
+      }
       if (txInfo.currency === "XRP") {
         paymentsTxInfoList.push(txInfo);
       } else {
