@@ -10,7 +10,7 @@ defineProps<{
 </script>
 
 <template>
-    <v-table width="100%" height="600px">
+    <v-table width="100%">
         <thead>
             <tr>
                 <th class="text-left">Date</th>

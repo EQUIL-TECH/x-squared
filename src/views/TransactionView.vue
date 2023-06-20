@@ -372,6 +372,9 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
           <v-tab value="four">
             <h3>Grouped Transactions</h3>
           </v-tab>
+          <v-tab value="five">
+            <h3>Reconciled</h3>
+          </v-tab>
         </v-tabs>
 
         <!-- Raw transactions -->
@@ -385,30 +388,36 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
           <transactionTable :txList="paymentsReceivedList" />
         </div>
         <div v-if="tab === 'four'">
-          <v-card>
-            <h3>Un Reconciled</h3>
-            <tr v-for="(item, index) in paymentsGroupedMap" :key="index">
-              <div>
-                <v-expansion-panels variant="accordion">
-                  <v-expansion-panel :title="item[0]">
-                    <div>
-                      <v-select density="compact" label="Select Account Type" v-model="whoAccount[index]"
-                        :items="accountTypes"></v-select>
-                      <v-expansion-panel-text>
-                        <v-card class="pa-5 mt-3">
+          <table width="100%" class="mt-5">
+            <tr v-for="(item, index) in paymentsGroupedMap" :key="index" width="100%">
+              <td>
+                <v-card variant="outlined" class="mb-5">
+                  <v-expansion-panels style="width: 100%" variant="accordion" class="mb-3">
+                    <v-expansion-panel :title="item[0]">
+                      <div>
+                        <v-expansion-panel-text>
+
                           <transactionTable :txList="item[1]" />
 
-                        </v-card>
-                      </v-expansion-panel-text>
+                        </v-expansion-panel-text>
 
-                    </div>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-
-              </div>
-
+                      </div>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
+                  <div class="d-flex justify-space-between center">
+                    <v-text-field class="ml-5" density="compact" label="Account Name"></v-text-field>
+                    <v-select class="mb-0 pb-0 ml-5" density="compact" variant="solo" label="Select Account Type"
+                      v-model="whoAccount[index]" :items="accountTypes"></v-select>
+                    <v-btn class="ml-5 mr-5" variant="tonal">SAVE</v-btn>
+                    <!-- <v-chip prepend-icon="mdi-check" class="ma-5 mt-0" color="green">Reconciled</v-chip> -->
+                  </div>
+                </v-card>
+              </td>
             </tr>
-          </v-card>
+          </table>
+        </div>
+        <div v-if="tab === 'five'">
+          <h3>Reconciled Transactions</h3>
         </div>
 
       </div>

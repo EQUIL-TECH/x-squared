@@ -30,7 +30,7 @@ export default defineComponent({
     <div v-else-if="userAccount === account">
         <!-- Blue is my account -->
         <router-link :to="`/?account=${account}`" class="link">
-            <v-chip link class="ma-2" color="primary" prepend-icon="mdi-checkbox-marked-circle">{{ account }}</v-chip>
+            <v-chip link class="ma-2" color="purple" prepend-icon="mdi-checkbox-marked-circle">{{ account }}</v-chip>
         </router-link>
     </div>
     <!-- <div v-else-if="userAccount === account">
@@ -41,7 +41,7 @@ export default defineComponent({
     <div v-else>
         <!-- Other persons account -->
         <router-link :to="`/?account=${account}`" class="link">
-            <v-chip link class="ma-2" color="purple" prepend-icon="mdi-account">{{ account }}</v-chip>
+            <v-chip link class="ma-2" color="primary" prepend-icon="mdi-account">{{ account }}</v-chip>
         </router-link>
     </div>
 </template>
