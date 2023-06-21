@@ -1,10 +1,3 @@
 <template>
-  <div class="logo">
-    <RouterLink to="/" class="d-flex">
-      <img src="../../../assets/images/logos/icon-white-logo-text.svg" />
-    </RouterLink>
-  </div>
+  <img src="../../../assets/images/logos/LogoLight.png" />
 </template>
-<script setup lang="ts">
-import { RouterLink } from "vue-router";
-</script>

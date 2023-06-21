@@ -419,9 +419,9 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
                   </v-expansion-panels>
                   <div class="d-flex justify-space-between center">
                     <v-text-field class="ml-5" density="compact" label="Account Name"></v-text-field>
-                    <v-select class="mb-0 pb-0 ml-5" density="compact" variant="solo" label="Select Account Type"
+                    <v-select class="mb-0 pb-0 ml-5" density="compact" label="Select Account Type"
                       v-model="whoAccount[index]" :items="accountTypes"></v-select>
-                    <v-btn class="ml-5 mr-5" variant="tonal">SAVE</v-btn>
+                    <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal">SAVE</v-btn>
                     <!-- <v-chip prepend-icon="mdi-check" class="ma-5 mt-0" color="green">Reconciled</v-chip> -->
                   </div>
                 </v-card>
@@ -430,7 +430,10 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
           </table>
         </div>
         <div v-if="tab === 'five'">
-          <h3>Reconciled Transactions</h3>
+          <v-card class="pa-5">
+            <h3>Reconciled Transactions</h3>
+            <p>Is this where reconciled transactions go?</p>
+          </v-card>
         </div>
 
       </div>

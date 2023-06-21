@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useCustomizerStore } from "../../../stores/customizer";
-import LogoLight from "../logo/LogoLight.vue";
-import LogoDark from "../logo/LogoDark.vue";
+// import IconLight from "@/layouts/full/icon/IconLight.vue";
+// import IconDark from "@/layouts/full/icon/IconDark.vue";
 import { saveDarkModeSetting, darkMode } from "@/stores/settings";
+import { RouterLink } from "vue-router";
 
 const customizer = useCustomizerStore();
 
@@ -30,6 +31,11 @@ function persistDarkMode() {
     <!---Logo part -->
     <!-- ---------------------------------------------- -->
     <div class="pa-4 pl-1 d-flex" style="width: 200px">
+      <!-- <div class="pa-4 pl-1">
+        <IconDark style=" width: 100%" v-if="!customizer.darktheme && customizer.navbarColor == '#ffffff'" />
+        <IconLight style=" width: 100%" v-else />
+      </div> -->
+
       <h2>X-SQUARED</h2>
       <!-- <LogoDark style="width: 100%" v-if="!customizer.darktheme && customizer.navbarColor == '#ffffff'" />
       <LogoLight style="width: 100%" v-else /> -->

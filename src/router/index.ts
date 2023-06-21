@@ -13,17 +13,10 @@ const router = createRouter({
           path: "/",
           component: () => import("@/views/TransactionView.vue"),
         },
-      ],
-    },
-    {
-      path: "/",
-      redirect: "landing",
-      component: () => import("@/layouts/blank/BlankLayout.vue"),
-      children: [
         {
-          name: "Donations",
-          path: "donations",
-          component: () => import("@/views/donations.vue"),
+          name: "Landing",
+          path: "/landing",
+          component: () => import("@/views/landing.vue"),
         },
       ],
     },
