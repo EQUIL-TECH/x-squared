@@ -7,24 +7,16 @@ import type { Transaction } from "xrpl";
 import transactionTable from "./transactionTable.vue";
 import CapitalGainsTable from "./CapitalGainsTable.vue";
 import { formatDate, getHistoricalCryptoPrice } from "@/services/coingecko";
-
-
+import { accType, accountTypes, depositWithDrawlTypes, incomingsOutgoingsTypes } from "@/models/accountTypes";
 
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
 const tab = ref(null)
-// const accountTypes = ["Exchange(AUD)", "3rd Party"]
-const accountTypes = ["Exchange(AUD)", "Client or Customer", "Goods or Services", "Owned Account"]
+const todaysRats = ref(0.9) // ! WARNING need to get this from coingecko
 
-// enum accountTypes {
-//   Exchange = "Exchange(AUD)",
-//   Client = "Client or Customer",
-//   Goods = "Goods or Services",
-//   Owned = "Owned Account"
-// }
 
-type AccountData = {
-  accountType: string,
+export type AccountData = {
+  accountType: accType,
   cryptoAmountSent: number,
   cryptoAmountReceived: number,
   fiatAmountSent: number,
@@ -33,61 +25,51 @@ type AccountData = {
   txListReceived: TransactionInfo[]
 }
 
-export type TransactionAccounts = {
-  Exchange: AccountData,
-  Client: AccountData,
-  Goods: AccountData,
-  Owned: AccountData,
+
+export type CalculatedGains = {
+  earningsCrypto: number,
+  earningsCryptoFiat: number,
+  earningsFiat: number,
+  earningsGainFiat: number,
+  fees: number,
+  assertsCrypto: number,
+  assertsCryptoFiat: number,
+  assertsFiat: number,
+  assetGainFiat: number,
 }
 
+const calculatedGains: Ref<CalculatedGains> = ref({
+  earningsCrypto: 0,
+  earningsCryptoFiat: 0,
+  earningsFiat: 0,
+  earningsGainFiat: 0,
+  fees: 0,
+  assertsCrypto: 0,
+  assertsCryptoFiat: 0,
+  assertsFiat: 0,
+  assetGainFiat: 0,
+})
 
-
-function resetTransactionAccounts(): TransactionAccounts {
-  return {
-    Exchange: {
-      accountType: "Exchange(AUD)",
+function resetTransactionAccounts(): Map<accType, AccountData> {
+  const outMap = new Map<accType, AccountData>();
+  accountTypes.forEach((accountType) => {
+    outMap.set(accountType, {
+      accountType: accountType,
       cryptoAmountSent: 0,
       cryptoAmountReceived: 0,
       fiatAmountSent: 0,
       fiatAmountReceived: 0,
       txListSent: [],
       txListReceived: []
-    },
-    Client: {
-      accountType: "Client or Customer",
-      cryptoAmountSent: 0,
-      cryptoAmountReceived: 0,
-      fiatAmountSent: 0,
-      fiatAmountReceived: 0,
-      txListSent: [],
-      txListReceived: []
-    },
-    Goods: {
-      accountType: "Goods or Services",
-      cryptoAmountSent: 0,
-      cryptoAmountReceived: 0,
-      fiatAmountSent: 0,
-      fiatAmountReceived: 0,
-      txListSent: [],
-      txListReceived: []
-    },
-    Owned: {
-      accountType: "Owned Account",
-      cryptoAmountSent: 0,
-      cryptoAmountReceived: 0,
-      fiatAmountSent: 0,
-      fiatAmountReceived: 0,
-      txListSent: [],
-      txListReceived: []
-    }
-
-  }
+    });
+  });
+  return outMap;
 }
-const txAccounts: Ref<TransactionAccounts> = ref(resetTransactionAccounts())
+const accountDataMap: Ref<Map<accType, AccountData>> = ref(resetTransactionAccounts())
 
 console.log()
 
-const whoAccount: Ref<string[]> = ref([]);
+const whoAccount: Ref<(accType | null)[]> = ref([]);
 
 
 
@@ -229,6 +211,14 @@ function getNFTokenAcceptOfferInfo(tx: Transaction, account: string) {
   return txInfo;
 }
 
+
+const tryCryptoPrice = async (formattedDate: string): Promise<number | null> =>
+  getHistoricalCryptoPrice(formattedDate)
+    .catch(async _ => {
+      await new Promise((resolve) => setTimeout(resolve, 20000));
+      return await tryCryptoPrice(formattedDate)
+    })
+
 async function precessTransactions() {
   const req = {
     id: 2,
@@ -257,8 +247,9 @@ async function precessTransactions() {
     if (tx.TransactionType === "Payment") {
       const txInfo = getPaymentInfo(tx, account);
       const formattedDate = formatDate(txInfo.date);
-      const price = await getHistoricalCryptoPrice(formattedDate)
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
+      // let price: number | null = await tryCryptoPrice(formattedDate)
+      let price: number | null = 0.7
+
       txInfo.fiatRate = price;
       if (price) {
         const roundedAmount = Math.round(price * txInfo.amount * 100) / 100;
@@ -296,7 +287,7 @@ async function precessTransactions() {
     (tx) => tx.direction === "received"
   );
   paymentsGroupedMap.value = groupBy(paymentsTxInfoList, (tx) => {
-    whoAccount.value.concat("data")
+    whoAccount.value.concat(null)
     return tx.txAddress
   });
 
@@ -304,54 +295,76 @@ async function precessTransactions() {
   return;
 }
 
-// onMounted(precessTransactions)
+onMounted(precessTransactions)
 
-precessTransactions()
+// precessTransactions()
 
 
 const fees = ref(0)
 
 
-function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
-  txAccounts.value = resetTransactionAccounts()
-
-  const paymentGroupedKeys = paymentGrouped.keys()
-  let index = 0
-  for (const address of paymentGroupedKeys) {
-    address as string;
-    const txInfoList = paymentGrouped.get(address) ?? []
-    for (const txInfo of txInfoList) {
-      fees.value += txInfo.fee
-      if (whoAccount.value[index] == txAccounts.value.Exchange.accountType) {
-        if (txInfo.direction === "sent") {
-          txAccounts.value.Exchange.cryptoAmountSent += txInfo.amount
-          txAccounts.value.Exchange.fiatAmountSent += txInfo.fiatAmount ?? 0
-        } else {
-          txAccounts.value.Exchange.cryptoAmountReceived += txInfo.amount
-          txAccounts.value.Exchange.fiatAmountReceived += txInfo.fiatAmount ?? 0
-        }
-      } else if (whoAccount.value[index] == txAccounts.value.Client.accountType) {
-        if (txInfo.direction === "sent") {
-          txAccounts.value.Client.cryptoAmountSent += txInfo.amount
-          txAccounts.value.Client.fiatAmountSent += txInfo.fiatAmount ?? 0
-        } else {
-          txAccounts.value.Client.cryptoAmountReceived += txInfo.amount
-          txAccounts.value.Client.fiatAmountReceived += txInfo.fiatAmount ?? 0
-        }
-      } else if (whoAccount.value[index] == txAccounts.value.Goods.accountType) {
-        if (txInfo.direction === "sent") {
-          txAccounts.value.Goods.cryptoAmountSent += txInfo.amount
-          txAccounts.value.Goods.fiatAmountSent += txInfo.fiatAmount ?? 0
-        } else {
-          txAccounts.value.Goods.cryptoAmountReceived += txInfo.amount
-          txAccounts.value.Goods.fiatAmountReceived += txInfo.fiatAmount ?? 0
-        }
-      }
-    }
-    index += 1
+function updateAccountData(accountData: AccountData, txInfo: TransactionInfo): AccountData {
+  if (txInfo.direction === "sent") {
+    accountData.cryptoAmountSent += txInfo.amount
+    accountData.fiatAmountSent += txInfo.fiatAmount ?? 0
+    return accountData
+  } else {
+    accountData.cryptoAmountReceived += txInfo.amount
+    accountData.fiatAmountReceived += txInfo.fiatAmount ?? 0
+    return accountData
   }
 
 }
+
+
+function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
+  accountDataMap.value = resetTransactionAccounts()
+  const paymentGroupedKeys = paymentGrouped.keys()
+  let index = 0
+  console.log(whoAccount.value)
+  for (const address of paymentGroupedKeys) {
+    address as string;
+    const txInfoList = paymentGrouped.get(address) ?? []
+    const aType = whoAccount.value[index]
+    console.log(aType)
+    if (!aType) {
+      continue
+    }
+    for (const txInfo of txInfoList) {
+      fees.value += txInfo.fee
+
+
+      const accData = accountDataMap.value.get(aType)
+      if (accData) {
+        const updatedAccData = updateAccountData(accData, txInfo)
+        accountDataMap.value.set(aType, updatedAccData)
+      }
+
+    }
+    index += 1
+
+  }
+  calculatedGains.value.earningsCrypto -= fees.value
+  incomingsOutgoingsTypes.forEach((aType) => {
+    calculatedGains.value.earningsCrypto += accountDataMap.value.get(aType)?.cryptoAmountReceived ?? 0
+    calculatedGains.value.earningsCrypto -= accountDataMap.value.get(aType)?.cryptoAmountSent ?? 0
+    calculatedGains.value.earningsFiat += accountDataMap.value.get(aType)?.fiatAmountReceived ?? 0
+    calculatedGains.value.earningsFiat -= accountDataMap.value.get(aType)?.fiatAmountSent ?? 0
+  })
+  depositWithDrawlTypes.forEach((aType) => {
+    calculatedGains.value.assertsCrypto += accountDataMap.value.get(aType)?.cryptoAmountReceived ?? 0
+    calculatedGains.value.assertsCrypto -= accountDataMap.value.get(aType)?.cryptoAmountSent ?? 0
+    calculatedGains.value.assertsFiat += accountDataMap.value.get(aType)?.fiatAmountReceived ?? 0
+    calculatedGains.value.assertsFiat -= accountDataMap.value.get(aType)?.fiatAmountSent ?? 0
+  })
+  calculatedGains.value.earningsCryptoFiat = calculatedGains.value.earningsCrypto * todaysRats.value
+  calculatedGains.value.earningsGainFiat = calculatedGains.value.earningsCryptoFiat - calculatedGains.value.earningsFiat
+  calculatedGains.value.assertsCryptoFiat = calculatedGains.value.assertsCrypto * todaysRats.value
+  calculatedGains.value.assetGainFiat = calculatedGains.value.assertsCryptoFiat - calculatedGains.value.assertsFiat
+
+
+}
+
 
 </script>
 
@@ -429,7 +442,7 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
           <h3>CALCULATE</h3>
         </v-btn>
 
-        <CapitalGainsTable :txAccounts="txAccounts" :fees="fees" />
+        <CapitalGainsTable :accountDataMap="accountDataMap" :calculatedGains="calculatedGains" />
 
       </v-card>
     </v-col>
