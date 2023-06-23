@@ -30,9 +30,9 @@ defineProps<{
         accountDataMap.get(accType.Goods)?.fiatAmountSent }} AUD</div>
     <br>
     <h4>---Calculated---</h4>
-    <div>Fiat: ${{ calculatedGains.earningsFiat }}</div>
-    <div>Crypto (converted): ${{ calculatedGains.earningsCryptoFiat }} AUD (converted)</div>
-    <div>Gains: ${{ calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat }} AUD</div>
+    <div>Cost of Crypto: ${{ calculatedGains.earningsFiat }}</div>
+    <div>Current Price: ${{ calculatedGains.earningsCryptoFiat }} AUD ({{ calculatedGains.earningsCrypto }} XRP)</div>
+    <div>Unrealized Gains: ${{ calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat }} AUD</div>
     <br>
 
     <h2>Holdings</h2>
@@ -48,13 +48,13 @@ defineProps<{
         accountDataMap.get(accType.Owned)?.fiatAmountSent }} AUD</div>
     <br>
     <h4>---Calculated---</h4>
-    <div>Fiat: ${{ calculatedGains.assertsFiat }}</div>
-    <div>Crypto: ${{ calculatedGains.assertsCryptoFiat }} AUD (converted)</div>
-    <div>Gains: ${{ calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat }} AUD</div>
+    <div>Cost of Crypto: ${{ calculatedGains.assertsFiat }}</div>
+    <div>Current Price: ${{ calculatedGains.assertsCryptoFiat }} AUD ({{ calculatedGains.assertsCrypto }} XRP)</div>
+    <div>Unrealized Gains: ${{ calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat }} AUD</div>
     <br>
     <h2>TOTAL</h2>
 
-    <div>Total gains: ${{ (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
+    <div>Total Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
         (calculatedGains.earningsFiat + calculatedGains.assertsFiat) }} AUD</div>
 
 
