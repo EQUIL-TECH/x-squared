@@ -13,35 +13,52 @@ defineProps<{
 </script>
 
 <template>
-    <h2>Transaction Table</h2>
-    <h3>Earnings</h3>
-    <h4>Deposits</h4>
-    <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountReceived }} XRP | {{
-        accountDataMap.get(accType.Exchange)?.cryptoAmountReceived }} AUD</div>
-    <div>{{ accType.Owned }} | {{ accountDataMap.get(accType.Owned)?.cryptoAmountReceived }} XRP | {{
-        accountDataMap.get(accType.Owned)?.cryptoAmountReceived }} AUD</div>
-    <div></div>
-    <h4>Withdraws</h4>
-    <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountSent }} XRP | {{
-        accountDataMap.get(accType.Exchange)?.cryptoAmountSent }} AUD</div>
-    <div>{{ accType.Owned }} | {{ accountDataMap.get(accType.Owned)?.cryptoAmountSent }} XRP | {{
-        accountDataMap.get(accType.Owned)?.cryptoAmountSent }} AUD</div>
-    <div></div>
-    <div></div>
-    <h3>Holdings</h3>
+    <h1>Capital Gains</h1>
+    <br>
+
+    <h2>Earnings</h2>
     <h4>Incomings</h4>
     <div>{{ accType.Client }} | {{ accountDataMap.get(accType.Client)?.cryptoAmountReceived }} XRP | {{
-        accountDataMap.get(accType.Client)?.cryptoAmountReceived }} AUD</div>
+        accountDataMap.get(accType.Client)?.fiatAmountReceived }} AUD</div>
     <div>{{ accType.Goods }} | {{ accountDataMap.get(accType.Goods)?.cryptoAmountReceived }} XRP | {{
-        accountDataMap.get(accType.Goods)?.cryptoAmountReceived }} AUD</div>
+        accountDataMap.get(accType.Goods)?.fiatAmountReceived }} AUD</div>
     <div></div>
     <h4>Outgoings</h4>
     <div>{{ accType.Client }} | {{ accountDataMap.get(accType.Client)?.cryptoAmountSent }} XRP | {{
-        accountDataMap.get(accType.Client)?.cryptoAmountSent }} AUD</div>
+        accountDataMap.get(accType.Client)?.fiatAmountSent }} AUD</div>
     <div>{{ accType.Goods }} | {{ accountDataMap.get(accType.Goods)?.cryptoAmountSent }} XRP | {{
-        accountDataMap.get(accType.Goods)?.cryptoAmountSent }} AUD</div>
-    <div></div>
-    <div></div>
+        accountDataMap.get(accType.Goods)?.fiatAmountSent }} AUD</div>
+    <br>
+    <h4>---Calculated---</h4>
+    <div>Fiat: ${{ calculatedGains.earningsFiat }}</div>
+    <div>Crypto (converted): ${{ calculatedGains.earningsCryptoFiat }} AUD (converted)</div>
+    <div>Gains: ${{ calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat }} AUD</div>
+    <br>
+
+    <h2>Holdings</h2>
+    <h4>Deposits</h4>
+    <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountReceived }} XRP | {{
+        accountDataMap.get(accType.Exchange)?.fiatAmountReceived }} AUD</div>
+    <div>{{ accType.Owned }} | {{ accountDataMap.get(accType.Owned)?.cryptoAmountReceived }} XRP | {{
+        accountDataMap.get(accType.Owned)?.fiatAmountReceived }} AUD</div>
+    <h4>Withdraws</h4>
+    <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountSent }} XRP | {{
+        accountDataMap.get(accType.Exchange)?.fiatAmountSent }} AUD</div>
+    <div>{{ accType.Owned }} | {{ accountDataMap.get(accType.Owned)?.cryptoAmountSent }} XRP | {{
+        accountDataMap.get(accType.Owned)?.fiatAmountSent }} AUD</div>
+    <br>
+    <h4>---Calculated---</h4>
+    <div>Fiat: ${{ calculatedGains.assertsFiat }}</div>
+    <div>Crypto: ${{ calculatedGains.assertsCryptoFiat }} AUD (converted)</div>
+    <div>Gains: ${{ calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat }} AUD</div>
+    <br>
+    <h2>TOTAL</h2>
+
+    <div>Total gains: ${{ (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
+        (calculatedGains.earningsFiat + calculatedGains.assertsFiat) }} AUD</div>
+
+
+
     <!-- <v-table width="100%" height="600px">
         <thead>
             <tr>
