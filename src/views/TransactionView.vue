@@ -370,7 +370,7 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
 
 <template>
   <v-row>
-    <v-col cols="12" lg="9">
+    <v-col cols="12" lg="12">
       <div>
         <v-tabs v-model="tab" color="primary" grow>
           <v-tab value="one">
@@ -386,7 +386,9 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
             <h3>Grouped Transactions</h3>
           </v-tab>
           <v-tab value="five">
-            <h3>Reconciled</h3>
+            <div style="background-color: #cff1ff; padding: 5px;">
+              <h3>Reports</h3>
+            </div>
           </v-tab>
         </v-tabs>
 
@@ -401,6 +403,13 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
           <transactionTable :txList="paymentsReceivedList" />
         </div>
         <div v-if="tab === 'four'">
+          <v-alert closable>
+            <h3>Assign Catgories</h3>
+            <p>Assign grouped transactions to category to generate report.</p>
+            <v-btn tonal class="mt-3" closable @click="tab = 'five'">
+              <h3>Generate Report</h3>
+            </v-btn>
+          </v-alert>
           <table width="100%" class="mt-5">
             <tr v-for="(item, index) in paymentsGroupedMap" :key="index" width="100%">
               <td>
@@ -418,7 +427,7 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
                     </v-expansion-panel>
                   </v-expansion-panels>
                   <div class="d-flex justify-space-between center">
-                    <v-text-field class="ml-5" density="compact" label="Account Name"></v-text-field>
+                    <!-- <v-text-field class="ml-5" density="compact" label="Account Name"></v-text-field> -->
                     <v-select class="mb-0 pb-0 ml-5" density="compact" label="Select Account Type"
                       v-model="whoAccount[index]" :items="accountTypes"></v-select>
                     <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal">SAVE</v-btn>
@@ -431,14 +440,22 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
         </div>
         <div v-if="tab === 'five'">
           <v-card class="pa-5">
-            <h3>Reconciled Transactions</h3>
-            <p>Is this where reconciled transactions go?</p>
+            <v-alert variant="tonal">
+              <h3>Generate a report</h3>
+              <p>Report is based on grouped transactions you have assigned a category to.</p>
+              <v-btn color="primary" class="mt-3" closable @click="calculate(paymentsGroupedMap)">
+                <h3>CALCULATE</h3>
+              </v-btn>
+            </v-alert>
+            <div class="mt-5">
+              <CapitalGainsTable :accountDataMap="accountDataMap" :calculatedGains="calculatedGains" />
+            </div>
           </v-card>
         </div>
 
       </div>
     </v-col>
-    <v-col cols="12" lg="3">
+    <!-- <v-col cols="12" lg="3">
       <v-card class="pa-5">
 
         <v-btn tonal block @click="calculate(paymentsGroupedMap)">
@@ -448,6 +465,6 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
         <CapitalGainsTable :accountDataMap="accountDataMap" :calculatedGains="calculatedGains" />
 
       </v-card>
-    </v-col>
+    </v-col> -->
   </v-row>
 </template>

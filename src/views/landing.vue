@@ -20,8 +20,12 @@ import IconDark from "@/layouts/full/icon/IconDark.vue";
             <!-- <v-btn variant="tonal" size="large" class="mt-5">
                 <h3>Connect Wallet</h3>
             </v-btn> -->
-            <v-btn variant="tonal" size="large" class="mt-5" to="/">
-                <h3>Get Started</h3>
+            <v-btn variant="tonal" size="large" class="mt-5" to="/reconcile">
+                <h3>Generate Report</h3>
+            </v-btn>
+            <v-btn variant="tonal" color="secondary" size="large" class="mt-5 ml-5" target="_blank"
+                href="https://cryptoinvoicegenerator.io">
+                <h3>Generate Invoice</h3>
             </v-btn>
         </v-col>
         <v-col cols="12" lg="6">

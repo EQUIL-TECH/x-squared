@@ -14,7 +14,7 @@ defineProps<{
 
 <template>
     <h1>Capital Gains</h1>
-    <br>
+
 
     <h2>Earnings</h2>
     <h4>Incomings</h4>
