@@ -10,71 +10,176 @@ defineProps<{
 
 </script>
 
+
 <template>
-    <h1>Capital Gains</h1>
+    <div class="container mt-4">
+        <div class="text-center mb-4">
+            <h1>Capital Gains</h1>
+        </div>
+        <div class="mb-5 calculated-box">
 
+            <div class="mb-5">
+                <h2>Earnings</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Crypto Received</th>
+                            <th>Fiat Received</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="type in [accType.Client, accType.Goods]" :key="type">
+                            <td>{{ type }}</td>
+                            <td>{{ accountDataMap.get(type)?.cryptoAmountReceived }} XRP</td>
+                            <td>{{ accountDataMap.get(type)?.fiatAmountReceived.toFixed(2) }} AUD</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-    <h2>Earnings</h2>
-    <h4>Incomings</h4>
-    <div>{{ accType.Client }} | {{ accountDataMap.get(accType.Client)?.cryptoAmountReceived }} XRP | {{
-        accountDataMap.get(accType.Client)?.fiatAmountReceived }} AUD</div>
-    <div>{{ accType.Goods }} | {{ accountDataMap.get(accType.Goods)?.cryptoAmountReceived }} XRP | {{
-        accountDataMap.get(accType.Goods)?.fiatAmountReceived }} AUD</div>
-    <div></div>
-    <h4>Outgoings</h4>
-    <div>{{ accType.Client }} | {{ accountDataMap.get(accType.Client)?.cryptoAmountSent }} XRP | {{
-        accountDataMap.get(accType.Client)?.fiatAmountSent }} AUD</div>
-    <div>{{ accType.Goods }} | {{ accountDataMap.get(accType.Goods)?.cryptoAmountSent }} XRP | {{
-        accountDataMap.get(accType.Goods)?.fiatAmountSent }} AUD</div>
-    <br>
-    <h4>---Calculated---</h4>
-    <div>Cost of Crypto: ${{ calculatedGains.earningsFiat }}</div>
-    <div>Current Price: ${{ calculatedGains.earningsCryptoFiat }} AUD ({{ calculatedGains.earningsCrypto }} XRP)</div>
-    <div>Unrealized Gains: ${{ calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat }} AUD</div>
-    <br>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Crypto Sent</th>
+                            <th>Fiat Sent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="type in [accType.Client, accType.Goods]" :key="type">
+                            <td>{{ type }}</td>
+                            <td>{{ accountDataMap.get(type)?.cryptoAmountSent }} XRP</td>
+                            <td>{{ accountDataMap.get(type)?.fiatAmountSent.toFixed(2) }} AUD</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-    <h2>Holdings</h2>
-    <h4>Deposits</h4>
-    <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountReceived }} XRP | {{
-        accountDataMap.get(accType.Exchange)?.fiatAmountReceived }} AUD</div>
-    <h4>Withdraws</h4>
-    <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountSent }} XRP | {{
-        accountDataMap.get(accType.Exchange)?.fiatAmountSent }} AUD</div>
-    <br>
-    <h4>---Calculated---</h4>
-    <div>Cost of Crypto: ${{ calculatedGains.assertsFiat }}</div>
-    <div>Current Price: ${{ calculatedGains.assertsCryptoFiat }} AUD ({{ calculatedGains.assertsCrypto }} XRP)</div>
-    <div>Unrealized Gains: ${{ calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat }} AUD</div>
-    <br>
-    <h2>TOTAL</h2>
+                <!-- Outgoings and Calculated sections remain unchanged -->
+            </div>
 
-    <div>Total Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
-        (calculatedGains.earningsFiat + calculatedGains.assertsFiat) }} AUD</div>
+            <h3>Totals</h3>
 
+            <!-- Deposit, Withdrawals, and Calculated sections remain unchanged -->
 
+            <div class="mb-3">
+                <div>Cost of Crypto: ${{ calculatedGains.earningsFiat.toFixed(2) }}</div>
+                <div>Current Price: ${{ calculatedGains.earningsCryptoFiat.toFixed(2) }} AUD ({{
+                    calculatedGains.earningsCrypto }} XRP)
+                </div>
+                <div
+                    :style="{ color: calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat < 0 ? 'red' : 'black' }">
+                    Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat).toFixed(2) }}
+                    AUD
+                </div>
+            </div>
+        </div>
+        <div class="mb-5 calculated-box">
 
-    <!-- <v-table width="100%" height="600px">
-        <thead>
-            <tr>
-                <th class="text-left">Date</th>
-                <th class="text-left">Amount</th>
-                <th class="text-left">Currency</th>
-                <th class="text-left">Direction</th>
-                <th class="text-left">AUD</th>
-                <th class="text-left">tx Address</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(item, index) in txList" :key="index">
-                <td>{{ item.date }}</td>
-                <td>{{ item.amount }}</td>
-                <td>{{ item.currency }}</td>
-                <td>{{ item.direction }}</td>
-                <td>${{ item.fiatAmount }}</td>
-                <td>{{ item.txAddress }}
-                    <AccountComponent :account="item.txAddress" :userAccount="'?'"></AccountComponent>
-                </td>
-            </tr>
-        </tbody>
-    </v-table> -->
+            <div class="mb-5">
+                <h2>Holdings</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Crypto Received</th>
+                            <th>Fiat Received</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="type in [accType.Exchange]" :key="type">
+                            <td>{{ type }}</td>
+                            <td>{{ accountDataMap.get(type)?.cryptoAmountReceived }} XRP</td>
+                            <td>{{ accountDataMap.get(type)?.fiatAmountReceived.toFixed(2) }} AUD</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Crypto Sent</th>
+                            <th>Fiat Sent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="type in [accType.Exchange]" :key="type">
+                            <td>{{ type }}</td>
+                            <td>{{ accountDataMap.get(type)?.cryptoAmountSent }} XRP</td>
+                            <td>{{ accountDataMap.get(type)?.fiatAmountSent.toFixed(2) }} AUD</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- Outgoings and Calculated sections remain unchanged -->
+            </div>
+
+            <h3>Totals</h3>
+
+            <!-- Deposit, Withdrawals, and Calculated sections remain unchanged -->
+
+            <div class="mb-3">
+                <div>Cost of Crypto: ${{ calculatedGains.assertsFiat.toFixed(2) }}</div>
+                <div>Current Price: ${{ calculatedGains.assertsCryptoFiat.toFixed(2) }} AUD ({{
+                    calculatedGains.assertsCrypto }} XRP)
+                </div>
+                <div
+                    :style="{ color: calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat < 0 ? 'red' : 'black' }">
+                    Unrealized Gains: ${{ (calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat).toFixed(2) }}
+                    AUD
+                </div>
+            </div>
+
+        </div>
+
+        <div>
+            <h2>TOTAL</h2>
+            <div :style="{
+                color: (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
+                    (calculatedGains.earningsFiat + calculatedGains.assertsFiat) < 0 ? 'red' : 'black'
+            }">
+                Total Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
+                    (calculatedGains.earningsFiat + calculatedGains.assertsFiat) }} AUD
+            </div>
+        </div>
+    </div>
 </template>
+    
+<style scoped>
+h1 {
+    color: #17a2b8;
+}
+
+h2 {
+    color: #007bff;
+}
+
+h4 {
+    color: #6c757d;
+}
+
+.calculated-box {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 15px;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+    text-align: left;
+    /* Aligns text to the left */
+}
+
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+}
+</style>
