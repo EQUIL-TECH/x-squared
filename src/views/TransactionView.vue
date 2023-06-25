@@ -376,19 +376,17 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
           <v-tab value="one">
             <h3>Raw Transactions</h3>
           </v-tab>
-          <v-tab value="two">
+          <!-- <v-tab value="two">
             <h3>Sent Transactions</h3>
           </v-tab>
           <v-tab value="three">
             <h3>received Transactions</h3>
-          </v-tab>
+          </v-tab> -->
           <v-tab value="four">
             <h3>Grouped Transactions</h3>
           </v-tab>
           <v-tab value="five">
-            <div style="background-color: #cff1ff; padding: 5px;">
-              <h3>Reports</h3>
-            </div>
+            <h3>Reports</h3>
           </v-tab>
         </v-tabs>
 
@@ -440,13 +438,13 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
         </div>
         <div v-if="tab === 'five'">
           <v-card class="pa-5">
-            <v-alert variant="tonal">
+            <!-- <v-alert variant="tonal">
               <h3>Generate a report</h3>
               <p>Report is based on grouped transactions you have assigned a category to.</p>
               <v-btn color="primary" class="mt-3" closable @click="calculate(paymentsGroupedMap)">
                 <h3>CALCULATE</h3>
               </v-btn>
-            </v-alert>
+            </v-alert> -->
             <div class="mt-5">
               <CapitalGainsTable :accountDataMap="accountDataMap" :calculatedGains="calculatedGains" />
             </div>

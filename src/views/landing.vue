@@ -49,11 +49,11 @@ import IconDark from "@/layouts/full/icon/IconDark.vue";
                             Look no further! X-SQUARED is a user-friendly web application designed just
                             for you.<br><br>
 
-                            As cryptocurrency gains popularity, more people and businesses are using XRP for their
+                            More people and businesses are using XRP for their
                             transactions.
                             With X-SQUARED, you can effortlessly account for your XRP transactions while ensuring you meet
                             all
-                            the necessary requirements for Capital Gains, GST, and Assets/Liabilities.<br><br>
+                            the necessary requirements for Capital Gains, GST, and BASs.<br><br>
 
                             Our platform is tailored specifically for XRP transactions, making it the perfect choice for
                             individuals and businesses in emerging markets who want to transact on the blockchain. Stay
