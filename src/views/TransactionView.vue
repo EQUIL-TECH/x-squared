@@ -2,18 +2,21 @@
 // import { getTransactions } from "@/services/xrpl";
 import { onMounted } from "vue";
 import { ref, type Ref } from "vue";
-import type { Client, AccountTxResponse, TransactionMetadata, Payment, NFTokenAcceptOffer, NFTokenMint, TrustSet, AccountSet, NFTokenCreateOffer } from "xrpl";
+import type { Client, AccountTxResponse, TransactionMetadata, Payment, NFTokenAcceptOffer, NFTokenMint, TrustSet, AccountSet, NFTokenCreateOffer, AccountInfoResponse } from "xrpl";
 import type { Transaction } from "xrpl";
 import transactionTable from "./transactionTable.vue";
 import CapitalGainsTable from "./CapitalGainsTable.vue";
 import { formatDate, getHistoricalCryptoPrice } from "@/services/coingecko";
 import { accType, accountTypes, depositWithDrawlTypes, incomingsOutgoingsTypes } from "@/models/accountTypes";
+import { addAddressData, AddressDataMapRef, getAddressData } from "@/stores/addresses";
+import AccountComponent from "./accountComponent.vue"
 
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
 const tab: Ref<string | null> = ref(null)
 const todaysRats = ref(0.9) // ! WARNING need to get this from coingecko
-
+const newUserAddress = ref("")
+const newUserName = ref("")
 
 export type AccountData = {
   accountType: accType,
@@ -67,15 +70,28 @@ function resetTransactionAccounts(): Map<accType, AccountData> {
 }
 const accountDataMap: Ref<Map<accType, AccountData>> = ref(resetTransactionAccounts())
 
-console.log()
-
 const whoAccount: Ref<(accType | null)[]> = ref([]);
 
 
 
 
-const urlParams = new URLSearchParams(window.location.search);
-const account = urlParams.get("account") || "rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9";
+// const urlParams = new URLSearchParams(window.location.search);
+const addressDataMap = getAddressData();
+const addressDataList = Array.from(addressDataMap.values());
+const ownedAddressDataList = addressDataList.filter((addressData) => addressData.owned);
+
+let address = "rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9"
+try {
+  const addData = ownedAddressDataList[0]
+  address = addData.address;
+} catch (error) {
+  console.log("no address found")
+}
+
+const balance: Ref<number | null> = ref(null);
+const nowDate = new Date().toDateString();
+
+//rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9
 
 const paymentsList: Ref<TransactionInfo[]> = ref([]);
 const paymentsSentList: Ref<TransactionInfo[]> = ref([]);
@@ -219,11 +235,30 @@ const tryCryptoPrice = async (formattedDate: string): Promise<number | null> =>
       return await tryCryptoPrice(formattedDate)
     })
 
+
+async function getBalance() {
+  const req = {
+    id: 2,
+    command: "account_info",
+    account: address,
+  };
+
+  // @ts-ignore
+  const client: Client = new xrpl.Client("wss://xrplcluster.com")
+  await client.connect();
+
+  const response: AccountInfoResponse = await client.request(req);
+  const bal = response.result.account_data.Balance;
+  balance.value = parseInt(bal) / 1000000;
+  client.disconnect();
+  return parseInt(bal) / 1000000;
+}
+
 async function precessTransactions() {
   const req = {
     id: 2,
     command: "account_tx",
-    account: account,
+    account: address,
     forward: false,
   };
 
@@ -245,7 +280,7 @@ async function precessTransactions() {
     // get date
 
     if (tx.TransactionType === "Payment") {
-      const txInfo = getPaymentInfo(tx, account);
+      const txInfo = getPaymentInfo(tx, address);
       const formattedDate = formatDate(txInfo.date);
       // let price: number | null = await tryCryptoPrice(formattedDate)
       let price: number | null = 0.7
@@ -267,9 +302,9 @@ async function precessTransactions() {
       tx.TransactionType === "NFTokenCreateOffer" ||
       tx.TransactionType === "TrustSet"
     ) {
-      getFeeTxInfo(tx, account);
+      getFeeTxInfo(tx, address);
     } else if (tx.TransactionType === "NFTokenAcceptOffer") {
-      const txInfo = getNFTokenAcceptOfferInfo(tx, account);
+      const txInfo = getNFTokenAcceptOfferInfo(tx, address);
       // todo
     } else if (tx.TransactionType === "OfferCreate") {
       // todo
@@ -296,6 +331,7 @@ async function precessTransactions() {
 }
 
 onMounted(precessTransactions)
+onMounted(getBalance)
 
 // precessTransactions()
 
@@ -361,9 +397,16 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
   calculatedGains.value.earningsGainFiat = calculatedGains.value.earningsCryptoFiat - calculatedGains.value.earningsFiat
   calculatedGains.value.assertsCryptoFiat = calculatedGains.value.assertsCrypto * todaysRats.value
   calculatedGains.value.assetGainFiat = calculatedGains.value.assertsCryptoFiat - calculatedGains.value.assertsFiat
-
-
 }
+
+function addUserAddress() {
+  if (newUserAddress.value && newUserName.value) {
+    //rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9
+    addAddressData(newUserAddress.value, newUserName.value, "Owned", true)
+    precessTransactions()
+  }
+}
+
 
 
 </script>
@@ -374,18 +417,15 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
       <div>
         <v-tabs v-model="tab" color="primary" grow>
           <v-tab value="one">
-            <h3>Raw Transactions</h3>
+            <h3>Dashboard</h3>
           </v-tab>
           <v-tab value="two">
-            <h3>Sent Transactions</h3>
+            <h3>Raw Transactions</h3>
           </v-tab>
           <v-tab value="three">
-            <h3>received Transactions</h3>
-          </v-tab>
-          <v-tab value="four">
             <h3>Grouped Transactions</h3>
           </v-tab>
-          <v-tab value="five">
+          <v-tab value="four">
             <div style="background-color: #cff1ff; padding: 5px;">
               <h3>Reports</h3>
             </div>
@@ -394,17 +434,37 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
 
         <!-- Raw transactions -->
         <div v-if="tab === 'one'">
-          <transactionTable :txList="paymentsList" />
+
+          <br>
+
+          <v-col cols="2" lg="6" md="6" sm="12">
+            <v-card elevation="10">
+              <v-card-text class="pa-5 pt-2 text-left">
+                <h4>{{ nowDate }}</h4>
+                <h3 class="title mb-1 mt-1">{{ AddressDataMapRef.get(address)?.name }}</h3>
+                <h3 class="title mb-1 mt-1">{{ balance }} XRP</h3>
+
+
+                <AccountComponent :account="address"></AccountComponent>
+              </v-card-text>
+            </v-card>
+            <br>
+            <div class="d-flex justify-space-between center">
+              <v-text-field class="ml-5" density="compact" label="XRP Address" v-model="newUserAddress"></v-text-field>
+              <v-text-field class="ml-5" density="compact" label="XRP Address Name" v-model="newUserName"></v-text-field>
+              <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal"
+                @click="addUserAddress">Add</v-btn>
+            </div>
+          </v-col>
+
+
         </div>
         <div v-if="tab === 'two'">
-          <transactionTable :txList="paymentsSentList" />
+          <transactionTable :txList="paymentsList" />
         </div>
         <div v-if="tab === 'three'">
-          <transactionTable :txList="paymentsReceivedList" />
-        </div>
-        <div v-if="tab === 'four'">
           <v-alert closable>
-            <h3>Assign Catgories</h3>
+            <h3>Assign Catagories</h3>
             <p>Assign grouped transactions to category to generate report.</p>
             <v-btn tonal class="mt-3" closable @click="tab = 'five'">
               <h3>Generate Report</h3>
@@ -427,7 +487,7 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
                     </v-expansion-panel>
                   </v-expansion-panels>
                   <div class="d-flex justify-space-between center">
-                    <!-- <v-text-field class="ml-5" density="compact" label="Account Name"></v-text-field> -->
+                    <v-text-field class="ml-5" density="compact" label="Account Name"></v-text-field>
                     <v-select class="mb-0 pb-0 ml-5" density="compact" label="Select Account Type"
                       v-model="whoAccount[index]" :items="accountTypes"></v-select>
                     <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal">SAVE</v-btn>
@@ -438,7 +498,7 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
             </tr>
           </table>
         </div>
-        <div v-if="tab === 'five'">
+        <div v-if="tab === 'four'">
           <v-card class="pa-5">
             <v-alert variant="tonal">
               <h3>Generate a report</h3>
