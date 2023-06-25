@@ -35,8 +35,9 @@ function persistDarkMode() {
         <IconDark style=" width: 100%" v-if="!customizer.darktheme && customizer.navbarColor == '#ffffff'" />
         <IconLight style=" width: 100%" v-else />
       </div> -->
-
-      <h2>X-SQUARED</h2>
+      <a href="/" style="text-decoration: none; color: black;">
+        <h2>X-SQUARED</h2>
+      </a>
       <!-- <LogoDark style="width: 100%" v-if="!customizer.darktheme && customizer.navbarColor == '#ffffff'" />
       <LogoLight style="width: 100%" v-else /> -->
     </div>
