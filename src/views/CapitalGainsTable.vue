@@ -8,8 +8,6 @@ defineProps<{
 }>();
 
 
-
-
 </script>
 
 <template>
@@ -39,13 +37,9 @@ defineProps<{
     <h4>Deposits</h4>
     <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountReceived }} XRP | {{
         accountDataMap.get(accType.Exchange)?.fiatAmountReceived }} AUD</div>
-    <div>{{ accType.Owned }} | {{ accountDataMap.get(accType.Owned)?.cryptoAmountReceived }} XRP | {{
-        accountDataMap.get(accType.Owned)?.fiatAmountReceived }} AUD</div>
     <h4>Withdraws</h4>
     <div>{{ accType.Exchange }} | {{ accountDataMap.get(accType.Exchange)?.cryptoAmountSent }} XRP | {{
         accountDataMap.get(accType.Exchange)?.fiatAmountSent }} AUD</div>
-    <div>{{ accType.Owned }} | {{ accountDataMap.get(accType.Owned)?.cryptoAmountSent }} XRP | {{
-        accountDataMap.get(accType.Owned)?.fiatAmountSent }} AUD</div>
     <br>
     <h4>---Calculated---</h4>
     <div>Cost of Crypto: ${{ calculatedGains.assertsFiat }}</div>
