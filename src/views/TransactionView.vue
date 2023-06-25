@@ -11,7 +11,7 @@ import { accType, accountTypes, depositWithDrawlTypes, incomingsOutgoingsTypes }
 
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
-const tab = ref(null)
+const tab: Ref<string | null> = ref(null)
 const todaysRats = ref(0.9) // ! WARNING need to get this from coingecko
 
 
