@@ -56,3 +56,16 @@ export async function getHistoricalCryptoPrice(
     return null;
   }
 }
+
+export async function getCurrentRipplePriceInAUD(): Promise<number> {
+  try {
+    const response = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=ripple&vs_currencies=AUD"
+    );
+    const data = await response.json();
+    return data.ripple.aud;
+  } catch (error) {
+    console.error("Error:", error);
+    return 0;
+  }
+}
