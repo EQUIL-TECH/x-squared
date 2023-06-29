@@ -6,7 +6,7 @@ import type { Client, AccountTxResponse, TransactionMetadata, Payment, NFTokenAc
 import type { Transaction } from "xrpl";
 import transactionTable from "./transactionTable.vue";
 import CapitalGainsTable from "./CapitalGainsTable.vue";
-import { formatDate, getHistoricalCryptoPrice } from "@/services/coingecko";
+import { formatDate, getCurrentRipplePriceInAUD, getHistoricalCryptoPrice } from "@/services/coingecko";
 import { accType, accountTypes, depositWithDrawlTypes, incomingsOutgoingsTypes } from "@/models/accountTypes";
 import { addAddressData, AddressDataMapRef, getAddressData } from "@/stores/addresses";
 import AccountComponent from "./accountComponent.vue"
@@ -14,9 +14,10 @@ import AccountComponent from "./accountComponent.vue"
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
 const tab: Ref<string | null> = ref(null)
-const todaysRats = ref(0.9) // ! WARNING need to get this from coingecko
+const todaysRate: Ref<number | null> = ref(null) // ! WARNING need to get this from coingecko
 const newUserAddress = ref("")
 const newUserName = ref("")
+
 
 export type AccountData = {
   accountType: accType,
@@ -239,6 +240,8 @@ async function getBalance() {
   const bal = response.result.account_data.Balance;
   balance.value = parseInt(bal) / 1000000;
   client.disconnect();
+  todaysRate.value = await getCurrentRipplePriceInAUD()
+  console.log("todaysRats", todaysRate.value)
   return parseInt(bal) / 1000000;
 }
 
@@ -287,8 +290,8 @@ async function precessTransactions() {
     if (tx.TransactionType === "Payment") {
       const txInfo = getPaymentInfo(tx, addr);
       const formattedDate = formatDate(txInfo.date);
-      // let price: number | null = await tryCryptoPrice(formattedDate)
-      let price: number | null = 0.7
+      let price: number | null = await tryCryptoPrice(formattedDate)
+      // let price: number | null = 0.7
 
       txInfo.fiatRate = price;
       if (price) {
@@ -335,6 +338,7 @@ async function precessTransactions() {
   return;
 }
 
+
 onMounted(precessTransactions)
 onMounted(getBalance)
 
@@ -363,6 +367,10 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
   const paymentGroupedKeys = paymentGrouped.keys()
   let index = 0
   console.log(whoAccount.value)
+  const rateToday = todaysRate.value
+  if (!rateToday) {
+    return
+  }
   for (const address of paymentGroupedKeys) {
     address as string;
     const txInfoList = paymentGrouped.get(address) ?? []
@@ -371,6 +379,7 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
     if (!aType) {
       continue
     }
+
     for (const txInfo of txInfoList) {
       fees.value += txInfo.fee
 
@@ -398,9 +407,9 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
     calculatedGains.value.assertsFiat += accountDataMap.value.get(aType)?.fiatAmountReceived ?? 0
     calculatedGains.value.assertsFiat -= accountDataMap.value.get(aType)?.fiatAmountSent ?? 0
   })
-  calculatedGains.value.earningsCryptoFiat = calculatedGains.value.earningsCrypto * todaysRats.value
+  calculatedGains.value.earningsCryptoFiat = calculatedGains.value.earningsCrypto * rateToday
   calculatedGains.value.earningsGainFiat = calculatedGains.value.earningsCryptoFiat - calculatedGains.value.earningsFiat
-  calculatedGains.value.assertsCryptoFiat = calculatedGains.value.assertsCrypto * todaysRats.value
+  calculatedGains.value.assertsCryptoFiat = calculatedGains.value.assertsCrypto * rateToday
   calculatedGains.value.assetGainFiat = calculatedGains.value.assertsCryptoFiat - calculatedGains.value.assertsFiat
 }
 
@@ -449,6 +458,11 @@ function addUserAddress() {
                   <h4>{{ nowDate }}</h4>
                   <h3 class="title mb-1 mt-1">{{ AddressDataMapRef.get(address)?.name }}</h3>
                   <h3 class="title mb-1 mt-1">{{ balance }} XRP</h3>
+                  <div v-if="todaysRate && balance">
+
+                    <h3 class="title mb-1 mt-1">{{ balance * todaysRate }} AUD</h3>
+
+                  </div>
 
 
                   <AccountComponent :account="address"></AccountComponent>
