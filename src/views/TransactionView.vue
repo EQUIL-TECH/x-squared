@@ -80,7 +80,6 @@ let address: Ref<string | null> = ref(null);
 const balance: Ref<number | null> = ref(null);
 const nowDate = new Date().toDateString();
 
-//rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9
 
 const paymentsList: Ref<TransactionInfo[]> = ref([]);
 const paymentsSentList: Ref<TransactionInfo[]> = ref([]);
@@ -407,7 +406,6 @@ function calculate(paymentGrouped: Map<string, TransactionInfo[]>) {
 
 function addUserAddress() {
   if (newUserAddress.value && newUserName.value) {
-    //rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9
     addAddressData(newUserAddress.value, newUserName.value, "Owned", true)
     precessTransactions()
     getBalance()
