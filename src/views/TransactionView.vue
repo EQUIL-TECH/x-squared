@@ -74,19 +74,8 @@ const whoAccount: Ref<(accType | null)[]> = ref([]);
 
 
 
+let address: Ref<string | null> = ref(null);
 
-// const urlParams = new URLSearchParams(window.location.search);
-const addressDataMap = getAddressData();
-const addressDataList = Array.from(addressDataMap.values());
-const ownedAddressDataList = addressDataList.filter((addressData) => addressData.owned);
-
-let address = "rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9"
-try {
-  const addData = ownedAddressDataList[0]
-  address = addData.address;
-} catch (error) {
-  console.log("no address found")
-}
 
 const balance: Ref<number | null> = ref(null);
 const nowDate = new Date().toDateString();
@@ -240,7 +229,7 @@ async function getBalance() {
   const req = {
     id: 2,
     command: "account_info",
-    account: address,
+    account: address.value,
   };
 
   // @ts-ignore
@@ -255,10 +244,27 @@ async function getBalance() {
 }
 
 async function precessTransactions() {
+  let addr = "";
+  const addressDataMap = getAddressData();
+  const addressDataList = Array.from(addressDataMap.values());
+  const ownedAddressDataList = addressDataList.filter((addressData) => addressData.owned);
+  try {
+    const addData = ownedAddressDataList[0]
+    address.value = addData.address;
+  } catch (error) {
+    console.log("no address found")
+  }
+
+
+  if (address.value === null) {
+    return;
+  } else {
+    addr = address.value;
+  }
   const req = {
     id: 2,
     command: "account_tx",
-    account: address,
+    account: addr,
     forward: false,
   };
 
@@ -280,7 +286,7 @@ async function precessTransactions() {
     // get date
 
     if (tx.TransactionType === "Payment") {
-      const txInfo = getPaymentInfo(tx, address);
+      const txInfo = getPaymentInfo(tx, addr);
       const formattedDate = formatDate(txInfo.date);
       // let price: number | null = await tryCryptoPrice(formattedDate)
       let price: number | null = 0.7
@@ -302,9 +308,9 @@ async function precessTransactions() {
       tx.TransactionType === "NFTokenCreateOffer" ||
       tx.TransactionType === "TrustSet"
     ) {
-      getFeeTxInfo(tx, address);
+      getFeeTxInfo(tx, addr);
     } else if (tx.TransactionType === "NFTokenAcceptOffer") {
-      const txInfo = getNFTokenAcceptOfferInfo(tx, address);
+      const txInfo = getNFTokenAcceptOfferInfo(tx, addr);
       // todo
     } else if (tx.TransactionType === "OfferCreate") {
       // todo
@@ -404,6 +410,7 @@ function addUserAddress() {
     //rK1PizWFJUMGo2dURxhvSzwL2c3jEuBYz9
     addAddressData(newUserAddress.value, newUserName.value, "Owned", true)
     precessTransactions()
+    getBalance()
   }
 }
 
@@ -434,27 +441,34 @@ function addUserAddress() {
 
         <!-- Raw transactions -->
         <div v-if="tab === 'one'">
-
-          <br>
-
           <v-col cols="2" lg="6" md="6" sm="12">
-            <v-card elevation="10">
-              <v-card-text class="pa-5 pt-2 text-left">
-                <h4>{{ nowDate }}</h4>
-                <h3 class="title mb-1 mt-1">{{ AddressDataMapRef.get(address)?.name }}</h3>
-                <h3 class="title mb-1 mt-1">{{ balance }} XRP</h3>
+            <div v-if="address">
+
+              <br>
+
+              <v-card elevation="10">
+                <v-card-text class="pa-5 pt-2 text-left">
+                  <h4>{{ nowDate }}</h4>
+                  <h3 class="title mb-1 mt-1">{{ AddressDataMapRef.get(address)?.name }}</h3>
+                  <h3 class="title mb-1 mt-1">{{ balance }} XRP</h3>
 
 
-                <AccountComponent :account="address"></AccountComponent>
-              </v-card-text>
-            </v-card>
-            <br>
-            <div class="d-flex justify-space-between center">
-              <v-text-field class="ml-5" density="compact" label="XRP Address" v-model="newUserAddress"></v-text-field>
-              <v-text-field class="ml-5" density="compact" label="XRP Address Name" v-model="newUserName"></v-text-field>
-              <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal"
-                @click="addUserAddress">Add</v-btn>
+                  <AccountComponent :account="address"></AccountComponent>
+                </v-card-text>
+              </v-card>
             </div>
+            <div v-else>
+              <br>
+              <div class="d-flex justify-space-between center">
+                <v-text-field class="ml-5" density="compact" label="XRP Address" v-model="newUserAddress"></v-text-field>
+                <v-text-field class="ml-5" density="compact" label="XRP Address Name"
+                  v-model="newUserName"></v-text-field>
+                <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal"
+                  @click="addUserAddress">Add</v-btn>
+              </div>
+
+            </div>
+
           </v-col>
 
 
