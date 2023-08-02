@@ -501,11 +501,11 @@ function addUserAddress() {
         </div>
         <div v-if="tab === 'three'">
           <v-card class="pa-5">
-            <h3>Have you finished assigning categories?</h3>
-            <p>Assign grouped transactions to category to generate report.</p>
-            <v-btn tonal class="mt-3" closable @click="tab = 'four'">
-              <h3>Generate Report</h3>
-            </v-btn>
+            <h3>Categorise your transactions to generate a report</h3>
+            <p>Only assigned transactions will be included in the report calculation.</p>
+            <!-- <v-btn tonal class="mt-3" closable @click="tab = 'four'">
+
+            </v-btn> -->
           </v-card>
           <table width="100%" class="mt-5">
             <tr v-for="(item, index) in paymentsGroupedMap" :key="index" width="100%">
