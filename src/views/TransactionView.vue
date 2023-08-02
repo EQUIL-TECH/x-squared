@@ -426,12 +426,15 @@ function addUserAddress() {
 </script>
 
 <template>
+  <v-row class="mb-10">
+    <h1>Reconcile</h1>
+  </v-row>
   <v-row>
     <v-col cols="12" lg="12">
       <div>
         <v-tabs v-model="tab" color="primary" grow>
           <v-tab value="one">
-            <h3>Dashboard</h3>
+            <h3>Accounts Dashboard</h3>
           </v-tab>
           <v-tab value="two">
             <h3>Raw Transactions</h3>
@@ -455,15 +458,14 @@ function addUserAddress() {
 
               <v-card elevation="10">
                 <v-card-text class="pa-5 pt-2 text-left">
-                  <h4>{{ nowDate }}</h4>
+                  <small>{{ nowDate }}</small>
                   <h3 class="title mb-1 mt-1">{{ AddressDataMapRef.get(address)?.name }}</h3>
-                  <h3 class="title mb-1 mt-1">{{ balance }} XRP</h3>
+                  <p>{{ balance }} XRP</p>
                   <div v-if="todaysRate && balance">
 
-                    <h3 class="title mb-1 mt-1">{{ balance * todaysRate }} AUD</h3>
+                    <p>{{ balance * todaysRate() }} AUD</p>
 
                   </div>
-
 
                   <AccountComponent :account="address"></AccountComponent>
                 </v-card-text>
@@ -471,13 +473,17 @@ function addUserAddress() {
             </div>
             <div v-else>
               <br>
-              <div class="d-flex justify-space-between center">
-                <v-text-field class="ml-5" density="compact" label="XRP Address" v-model="newUserAddress"></v-text-field>
-                <v-text-field class="ml-5" density="compact" label="XRP Address Name"
-                  v-model="newUserName"></v-text-field>
-                <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal"
-                  @click="addUserAddress">Add</v-btn>
-              </div>
+              <v-card class="pa-5" elevation="2">
+                <h3>Enter Address</h3>
+                <p>To get started, enter your XRP address.</p><br>
+                <div class="d-flex justify-space-between center">
+                  <v-text-field class="" density="compact" label="XRP Address" v-model="newUserAddress"></v-text-field>
+                  <v-text-field class="ml-5" density="compact" label="XRP Address Name"
+                    v-model="newUserName"></v-text-field>
+                  <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal"
+                    @click="addUserAddress">Add</v-btn>
+                </div>
+              </v-card>
 
             </div>
 

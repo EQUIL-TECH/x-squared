@@ -13,19 +13,19 @@ defineProps<{
 
 <template>
     <div class="container mt-4">
-        <div class="text-center mb-4">
-            <h1>Capital Gains</h1>
+        <div class="text-left mb-4">
+            <h1 class="text-primary">Capital Gains</h1>
         </div>
         <div class="mb-5 calculated-box">
 
             <div class="mb-5">
-                <h2>Earnings</h2>
+                <h2 class="text-primary">Earnings</h2>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Crypto Received</th>
-                            <th>Fiat Received</th>
+                            <th width="30%">Type</th>
+                            <th width="30%">Crypto Received</th>
+                            <th width="30%">Fiat Received</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,9 +40,9 @@ defineProps<{
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Crypto Sent</th>
-                            <th>Fiat Sent</th>
+                            <th width="30%">Type</th>
+                            <th width="30%">Crypto Sent</th>
+                            <th width="30%">Fiat Sent</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,33 +56,35 @@ defineProps<{
 
                 <!-- Outgoings and Calculated sections remain unchanged -->
             </div>
+            <div style="padding: 10px;">
+                <h3>Totals</h3>
 
-            <h3>Totals</h3>
+                <!-- Deposit, Withdrawals, and Calculated sections remain unchanged -->
 
-            <!-- Deposit, Withdrawals, and Calculated sections remain unchanged -->
-
-            <div class="mb-3">
-                <div>Cost of Crypto: ${{ calculatedGains.earningsFiat.toFixed(2) }}</div>
-                <div>Current Price: ${{ calculatedGains.earningsCryptoFiat.toFixed(2) }} AUD ({{
-                    calculatedGains.earningsCrypto }} XRP)
-                </div>
-                <div
-                    :style="{ color: calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat < 0 ? 'red' : 'black' }">
-                    Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat).toFixed(2) }}
-                    AUD
+                <div class="mb-3">
+                    <div>Cost of Crypto: ${{ calculatedGains.earningsFiat.toFixed(2) }}</div>
+                    <div>Current Price: ${{ calculatedGains.earningsCryptoFiat.toFixed(2) }} AUD ({{
+                        calculatedGains.earningsCrypto }} XRP)
+                    </div>
+                    <div
+                        :style="{ color: calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat < 0 ? 'red' : 'black' }">
+                        Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat).toFixed(2)
+                        }}
+                        AUD
+                    </div>
                 </div>
             </div>
         </div>
         <div class="mb-5 calculated-box">
 
             <div class="mb-5">
-                <h2>Holdings</h2>
+                <h2 class="text-primary">Holdings</h2>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Crypto Received</th>
-                            <th>Fiat Received</th>
+                            <th width="30%">Type</th>
+                            <th width="30%">Crypto Received</th>
+                            <th width="30%">Fiat Received</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,9 +99,9 @@ defineProps<{
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Crypto Sent</th>
-                            <th>Fiat Sent</th>
+                            <th width="30%">Type</th>
+                            <th width="30%">Crypto Sent</th>
+                            <th width="30%">Fiat Sent</th>
                         </tr>
                     </thead>
                     <tbody>
