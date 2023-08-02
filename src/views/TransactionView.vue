@@ -17,6 +17,11 @@ const tab: Ref<string | null> = ref(null)
 const todaysRate: Ref<number | null> = ref(null) // ! WARNING need to get this from coingecko
 const newUserAddress = ref("")
 const newUserName = ref("")
+const buttonclick = ref(false)
+
+function handleButtonClick() {
+  buttonclick.value = true
+}
 
 
 export type AccountData = {
@@ -463,7 +468,7 @@ function addUserAddress() {
                   <p>{{ balance }} XRP</p>
                   <div v-if="todaysRate && balance">
 
-                    <p>{{ balance * todaysRate() }} AUD</p>
+                    <p>{{ balance * todaysRate }} AUD</p>
 
                   </div>
 
@@ -495,13 +500,13 @@ function addUserAddress() {
           <transactionTable :txList="paymentsList" />
         </div>
         <div v-if="tab === 'three'">
-          <v-alert closable>
-            <h3>Assign Catagories</h3>
+          <v-card class="pa-5">
+            <h3>Have you finished assigning categories?</h3>
             <p>Assign grouped transactions to category to generate report.</p>
-            <v-btn tonal class="mt-3" closable @click="tab = 'five'">
+            <v-btn tonal class="mt-3" closable @click="tab = 'four'">
               <h3>Generate Report</h3>
             </v-btn>
-          </v-alert>
+          </v-card>
           <table width="100%" class="mt-5">
             <tr v-for="(item, index) in paymentsGroupedMap" :key="index" width="100%">
               <td>
@@ -532,14 +537,14 @@ function addUserAddress() {
         </div>
         <div v-if="tab === 'four'">
           <v-card class="pa-5">
-            <v-alert variant="tonal">
+            <div v-if="buttonclick === false">
               <h3>Generate a report</h3>
               <p>Report is based on grouped transactions you have assigned a category to.</p>
-              <v-btn color="primary" class="mt-3" closable @click="calculate(paymentsGroupedMap)">
+              <v-btn color="primary" class="mt-3" closable @click="calculate(paymentsGroupedMap); handleButtonClick()">
                 <h3>CALCULATE</h3>
               </v-btn>
-            </v-alert>
-            <div class="mt-5">
+            </div>
+            <div v-else>
               <CapitalGainsTable :accountDataMap="accountDataMap" :calculatedGains="calculatedGains" />
             </div>
           </v-card>
