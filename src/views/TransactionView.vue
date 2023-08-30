@@ -11,6 +11,8 @@ import { accType, accountTypes, depositWithDrawlTypes, incomingsOutgoingsTypes }
 import { addAddressData, AddressDataMapRef, getAddressData } from "@/stores/addresses";
 import AccountComponent from "./accountComponent.vue"
 import tokensComponent from "./tokensComponent.vue"
+import monthlyCashflow from "./monthlyCashflow.vue"
+import { Direction, type TransactionInfo } from "./modles";
 
 
 
@@ -92,20 +94,6 @@ const paymentsReceivedList: Ref<TransactionInfo[]> = ref([]);
 
 const paymentsGroupedMap: Ref<Map<string, TransactionInfo[]>> = ref(new Map());
 
-
-export type TransactionInfo = {
-  tx_type: string;
-  direction: string;
-  amount: number;
-  date: string;
-  currency: string;
-  is_fee: boolean;
-  fee: number;
-  hash: string;
-  txAddress: string;
-  fiatRate?: number | null;
-  fiatAmount?: number | null;
-};
 
 function groupBy(txList: TransactionInfo[], getKey: (item: TransactionInfo) => string): Map<string, TransactionInfo[]> {
   return txList.reduce((groupedItems: Map<string, TransactionInfo[]>, currentItem: TransactionInfo) => {
@@ -475,7 +463,14 @@ function addUserAddress() {
               <v-card elevation="10">
                 <tokensComponent :address="address"></tokensComponent>
               </v-card>
-
+              <br>
+              <v-card elevation="10">
+                <monthlyCashflow :tx-list="paymentsList" :direction="Direction.SENT"></monthlyCashflow>
+              </v-card>
+              <br>
+              <v-card elevation="10">
+                <monthlyCashflow :tx-list="paymentsList" :direction="Direction.RECEIVED"></monthlyCashflow>
+              </v-card>
 
             </div>
             <div v-else>
