@@ -12,20 +12,20 @@ defineProps<{
 
 
 <template>
-    <div class="container mt-4">
-        <div class="text-center mb-4">
-            <h1>Capital Gains</h1>
+    <v-card>
+        <div class="text-left mb-4">
+            <h1 class="text-black">Report</h1>
         </div>
         <div class="mb-5 calculated-box">
 
             <div class="mb-5">
-                <h2>Earnings</h2>
+                <h2 class="text-primary">Earnings</h2>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Crypto Received</th>
-                            <th>Fiat Received</th>
+                            <th width="30%">Type</th>
+                            <th width="30%">Crypto Received</th>
+                            <th width="30%">Fiat Received</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,9 +40,9 @@ defineProps<{
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Crypto Sent</th>
-                            <th>Fiat Sent</th>
+                            <th width="30%">Type</th>
+                            <th width="30%">Crypto Sent</th>
+                            <th width="30%">Fiat Sent</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,33 +56,35 @@ defineProps<{
 
                 <!-- Outgoings and Calculated sections remain unchanged -->
             </div>
+            <div style="padding: 10px;">
+                <h3>Totals</h3>
 
-            <h3>Totals</h3>
+                <!-- Deposit, Withdrawals, and Calculated sections remain unchanged -->
 
-            <!-- Deposit, Withdrawals, and Calculated sections remain unchanged -->
-
-            <div class="mb-3">
-                <div>Cost of Crypto: ${{ calculatedGains.earningsFiat.toFixed(2) }}</div>
-                <div>Current Price: ${{ calculatedGains.earningsCryptoFiat.toFixed(2) }} AUD ({{
-                    calculatedGains.earningsCrypto }} XRP)
-                </div>
-                <div
-                    :style="{ color: calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat < 0 ? 'red' : 'black' }">
-                    Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat).toFixed(2) }}
-                    AUD
+                <div class="mb-3">
+                    <div>Cost of Crypto: ${{ calculatedGains.earningsFiat.toFixed(2) }}</div>
+                    <div>Current Price: ${{ calculatedGains.earningsCryptoFiat.toFixed(2) }} AUD ({{
+                        calculatedGains.earningsCrypto }} XRP)
+                    </div>
+                    <div
+                        :style="{ color: calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat < 0 ? 'red' : 'black' }">
+                        Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat - calculatedGains.earningsFiat).toFixed(2)
+                        }}
+                        AUD
+                    </div>
                 </div>
             </div>
         </div>
         <div class="mb-5 calculated-box">
 
             <div class="mb-5">
-                <h2>Holdings</h2>
+                <h2 class="text-primary">Holdings</h2>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Crypto Received</th>
-                            <th>Fiat Received</th>
+                            <th width="30%">Type</th>
+                            <th width="30%">Crypto Received</th>
+                            <th width="30%">Fiat Received</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,9 +99,9 @@ defineProps<{
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Crypto Sent</th>
-                            <th>Fiat Sent</th>
+                            <th width="30%">Type</th>
+                            <th width="30%">Crypto Sent</th>
+                            <th width="30%">Fiat Sent</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -113,35 +115,38 @@ defineProps<{
                 <!-- Outgoings and Calculated sections remain unchanged -->
             </div>
 
-            <h3>Totals</h3>
+            <div style="padding: 10px;">
+                <h3>Totals</h3>
 
-            <!-- Deposit, Withdrawals, and Calculated sections remain unchanged -->
+                <!-- Deposit, Withdrawals, and Calculated sections remain unchanged -->
 
-            <div class="mb-3">
-                <div>Cost of Crypto: ${{ calculatedGains.assertsFiat.toFixed(2) }}</div>
-                <div>Current Price: ${{ calculatedGains.assertsCryptoFiat.toFixed(2) }} AUD ({{
-                    calculatedGains.assertsCrypto }} XRP)
-                </div>
-                <div
-                    :style="{ color: calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat < 0 ? 'red' : 'black' }">
-                    Unrealized Gains: ${{ (calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat).toFixed(2) }}
-                    AUD
+                <div class="mb-3">
+                    <div>Cost of Crypto: ${{ calculatedGains.assertsFiat.toFixed(2) }}</div>
+                    <div>Current Price: ${{ calculatedGains.assertsCryptoFiat.toFixed(2) }} AUD ({{
+                        calculatedGains.assertsCrypto }} XRP)
+                    </div>
+                    <div
+                        :style="{ color: calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat < 0 ? 'red' : 'black' }">
+                        Unrealized Gains: ${{ (calculatedGains.assertsCryptoFiat - calculatedGains.assertsFiat).toFixed(2)
+                        }}
+                        AUD
+                    </div>
                 </div>
             </div>
 
         </div>
 
-        <div>
-            <h2>TOTAL</h2>
+        <div style="padding: 20px; background-color: #f1f1f1; color: white;">
+            <h2 class="text-primary">TOTAL</h2>
             <div :style="{
-                color: (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
-                    (calculatedGains.earningsFiat + calculatedGains.assertsFiat) < 0 ? 'red' : 'black'
-            }">
+                    color: (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
+                        (calculatedGains.earningsFiat + calculatedGains.assertsFiat) < 0 ? 'red' : 'black'
+                }">
                 Total Unrealized Gains: ${{ (calculatedGains.earningsCryptoFiat + calculatedGains.assertsCryptoFiat) -
                     (calculatedGains.earningsFiat + calculatedGains.assertsFiat) }} AUD
             </div>
         </div>
-    </div>
+    </v-card>
 </template>
     
 <style scoped>
@@ -161,6 +166,7 @@ h4 {
     border: 1px solid #dee2e6;
     border-radius: 0.25rem;
     padding: 15px;
+    box-shadow: 3px 3px 10px #f1f1f1;
 }
 
 .table {

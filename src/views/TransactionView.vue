@@ -22,6 +22,11 @@ const tab: Ref<string | null> = ref(null)
 const todaysRate: Ref<number | null> = ref(null) // ! WARNING need to get this from coingecko
 const newUserAddress = ref("")
 const newUserName = ref("")
+const buttonclick = ref(false)
+
+function handleButtonClick() {
+  buttonclick.value = true
+}
 
 
 export type AccountData = {
@@ -417,12 +422,15 @@ function addUserAddress() {
 </script>
 
 <template>
+  <v-row class="mb-10">
+    <h1>Reconcile</h1>
+  </v-row>
   <v-row>
     <v-col cols="12" lg="12">
       <div>
         <v-tabs v-model="tab" color="primary" grow>
           <v-tab value="one">
-            <h3>Dashboard</h3>
+            <h3>Accounts Dashboard</h3>
           </v-tab>
           <v-tab value="two">
             <h3>Raw Transactions</h3>
@@ -446,15 +454,14 @@ function addUserAddress() {
 
               <v-card elevation="10">
                 <v-card-text class="pa-5 pt-2 text-left">
-                  <h4>{{ nowDate }}</h4>
+                  <small>{{ nowDate }}</small>
                   <h3 class="title mb-1 mt-1">{{ AddressDataMapRef.get(address)?.name }}</h3>
-                  <h3 class="title mb-1 mt-1">{{ balance }} XRP</h3>
+                  <p>{{ balance }} XRP</p>
                   <div v-if="todaysRate && balance">
 
-                    <h3 class="title mb-1 mt-1">{{ balance * todaysRate }} AUD</h3>
+                    <p>{{ balance * todaysRate }} AUD</p>
 
                   </div>
-
 
                   <AccountComponent :account="address"></AccountComponent>
                 </v-card-text>
@@ -475,13 +482,17 @@ function addUserAddress() {
             </div>
             <div v-else>
               <br>
-              <div class="d-flex justify-space-between center">
-                <v-text-field class="ml-5" density="compact" label="XRP Address" v-model="newUserAddress"></v-text-field>
-                <v-text-field class="ml-5" density="compact" label="XRP Address Name"
-                  v-model="newUserName"></v-text-field>
-                <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal"
-                  @click="addUserAddress">Add</v-btn>
-              </div>
+              <v-card class="pa-5" elevation="2">
+                <h3>Enter Address</h3>
+                <p>To get started, enter your XRP address.</p><br>
+                <div class="d-flex justify-space-between center">
+                  <v-text-field class="" density="compact" label="XRP Address" v-model="newUserAddress"></v-text-field>
+                  <v-text-field class="ml-5" density="compact" label="XRP Address Name"
+                    v-model="newUserName"></v-text-field>
+                  <v-btn color="primary" class="ml-5 mr-5" style="height: 42px;" variant="tonal"
+                    @click="addUserAddress">Add</v-btn>
+                </div>
+              </v-card>
 
             </div>
 
@@ -493,13 +504,13 @@ function addUserAddress() {
           <transactionTable :txList="paymentsList" />
         </div>
         <div v-if="tab === 'three'">
-          <v-alert closable>
-            <h3>Assign Catagories</h3>
-            <p>Assign grouped transactions to category to generate report.</p>
-            <v-btn tonal class="mt-3" closable @click="tab = 'five'">
-              <h3>Generate Report</h3>
-            </v-btn>
-          </v-alert>
+          <v-card class="pa-5">
+            <h3>Categorise your transactions to generate a report</h3>
+            <p>Only assigned transactions will be included in the report calculation.</p>
+            <!-- <v-btn tonal class="mt-3" closable @click="tab = 'four'">
+
+            </v-btn> -->
+          </v-card>
           <table width="100%" class="mt-5">
             <tr v-for="(item, index) in paymentsGroupedMap" :key="index" width="100%">
               <td>
@@ -530,14 +541,14 @@ function addUserAddress() {
         </div>
         <div v-if="tab === 'four'">
           <v-card class="pa-5">
-            <v-alert variant="tonal">
+            <div v-if="buttonclick === false">
               <h3>Generate a report</h3>
               <p>Report is based on grouped transactions you have assigned a category to.</p>
-              <v-btn color="primary" class="mt-3" closable @click="calculate(paymentsGroupedMap)">
+              <v-btn color="primary" class="mt-3" closable @click="calculate(paymentsGroupedMap); handleButtonClick()">
                 <h3>CALCULATE</h3>
               </v-btn>
-            </v-alert>
-            <div class="mt-5">
+            </div>
+            <div v-else>
               <CapitalGainsTable :accountDataMap="accountDataMap" :calculatedGains="calculatedGains" />
             </div>
           </v-card>

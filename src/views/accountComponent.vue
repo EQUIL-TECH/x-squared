@@ -25,13 +25,12 @@ export default defineComponent({
 <template>
     <div v-if="account === null">
         <!-- RED is BURNED -->
-        <v-chip link class="ma-2" color="red" prepend-icon="mdi-alpha-x-circle">BURNED</v-chip>
+        <v-chip size="x-small" class="ma-2" color="red" prepend-icon="mdi-alpha-x-circle">BURNED</v-chip>
     </div>
     <div v-else-if="userAccount === account">
         <!-- Blue is my account -->
-        <router-link :to="`/?account=${account}`" class="link">
-            <v-chip link class="ma-2" color="purple" prepend-icon="mdi-checkbox-marked-circle">{{ account }}</v-chip>
-        </router-link>
+        <v-chip size="x-small" class="ma-2" color="purple" prepend-icon="mdi-checkbox-marked-circle">{{ account
+        }}</v-chip>
     </div>
     <!-- <div v-else-if="userAccount === account">
         <router-link :to="`/?account=${account}`" class="link">
@@ -40,9 +39,7 @@ export default defineComponent({
     </div> -->
     <div v-else>
         <!-- Other persons account -->
-        <router-link :to="`/?account=${account}`" class="link">
-            <v-chip link class="ma-2" color="primary" prepend-icon="mdi-account">{{ account }}</v-chip>
-        </router-link>
+        <v-chip size="x-small" class="ma-2" color="primary" prepend-icon="mdi-account">{{ account }}</v-chip>
     </div>
 </template>
 

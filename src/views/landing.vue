@@ -16,7 +16,7 @@ import IconDark from "@/layouts/full/icon/IconDark.vue";
                 <IconLight style=" width: 15%" v-else />
             </div>
             <h1 style="font-size: 80px; line-height: 72px;" class="mb-5">Your XRP accounted for</h1>
-            <p style="font-size: 24px;">For Australians using XRP for transactions</p>
+            <p style="font-size: 24px;">For Australian Individuals & Businesses using XRP for transactions.</p>
             <!-- <v-btn variant="tonal" size="large" class="mt-5">
                 <h3>Connect Wallet</h3>
             </v-btn> -->
@@ -36,34 +36,6 @@ import IconDark from "@/layouts/full/icon/IconDark.vue";
                 <HeroLight style="width: 100%" v-else />
             </div>
             <!-- <img style="width: 100%; padding-bottom: 20px;" src="@/assets/images/hero.png" /> -->
-        </v-col>
-        <v-col cols="12" lg="12">
-            <v-card class="pa-5 mt-5">
-                <v-row>
-                    <v-col cols="12" lg="12">
-                        <h1>The Easy Way to Track Your XRP Transactions!</h1>
-                        <h4>Are you in Australia and want to stay compliant with financial and tax regulations when it comes
-                            to
-                            your XRP transactions?</h4><br>
-                        <p>
-                            Look no further! X-SQUARED is a user-friendly web application designed just
-                            for you.<br><br>
-
-                            As cryptocurrency gains popularity, more people and businesses are using XRP for their
-                            transactions.
-                            With X-SQUARED, you can effortlessly account for your XRP transactions while ensuring you meet
-                            all
-                            the necessary requirements for Capital Gains, GST, and Assets/Liabilities.<br><br>
-
-                            Our platform is tailored specifically for XRP transactions, making it the perfect choice for
-                            individuals and businesses in emerging markets who want to transact on the blockchain. Stay
-                            ahead of
-                            the game and simplify your XRP accounting with X-SQUARED!<br><br>
-
-                            Sign up now and take control of your XRP transactions with ease </p>
-                    </v-col>
-                </v-row>
-            </v-card>
         </v-col>
     </v-row>
 </template>
