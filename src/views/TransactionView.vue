@@ -10,6 +10,9 @@ import { formatDate, getCurrentRipplePriceInAUD, getHistoricalCryptoPrice } from
 import { accType, accountTypes, depositWithDrawlTypes, incomingsOutgoingsTypes } from "@/models/accountTypes";
 import { addAddressData, AddressDataMapRef, getAddressData } from "@/stores/addresses";
 import AccountComponent from "./accountComponent.vue"
+import tokensComponent from "./tokensComponent.vue"
+
+
 
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
@@ -241,7 +244,7 @@ async function getBalance() {
   balance.value = parseInt(bal) / 1000000;
   client.disconnect();
   todaysRate.value = await getCurrentRipplePriceInAUD()
-  console.log("todaysRats", todaysRate.value)
+  console.log("todaysRate", todaysRate.value)
   return parseInt(bal) / 1000000;
 }
 
@@ -468,6 +471,12 @@ function addUserAddress() {
                   <AccountComponent :account="address"></AccountComponent>
                 </v-card-text>
               </v-card>
+              <br>
+              <v-card elevation="10">
+                <tokensComponent :address="address"></tokensComponent>
+              </v-card>
+
+
             </div>
             <div v-else>
               <br>
