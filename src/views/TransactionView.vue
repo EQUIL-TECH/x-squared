@@ -10,6 +10,11 @@ import { formatDate, getCurrentRipplePriceInAUD, getHistoricalCryptoPrice } from
 import { accType, accountTypes, depositWithDrawlTypes, incomingsOutgoingsTypes } from "@/models/accountTypes";
 import { addAddressData, AddressDataMapRef, getAddressData } from "@/stores/addresses";
 import AccountComponent from "./accountComponent.vue"
+import tokensComponent from "./tokensComponent.vue"
+import monthlyCashflow from "./monthlyCashflow.vue"
+import { Direction, type TransactionInfo } from "./modles";
+
+
 
 // AccountDelete | AccountSet | CheckCancel | CheckCash | CheckCreate | DepositPreauth | EscrowCancel | EscrowCreate | EscrowFinish | NFTokenAcceptOffer | NFTokenBurn | NFTokenCancelOffer | NFTokenCreateOffer | NFTokenMint | OfferCancel | OfferCreate | Payment | PaymentChannelClaim | PaymentChannelCreate | PaymentChannelFund | SetRegularKey | SignerListSet | TicketCreate | TrustSet
 // TODO: add these types into the transaction filters
@@ -94,20 +99,6 @@ const paymentsReceivedList: Ref<TransactionInfo[]> = ref([]);
 
 const paymentsGroupedMap: Ref<Map<string, TransactionInfo[]>> = ref(new Map());
 
-
-export type TransactionInfo = {
-  tx_type: string;
-  direction: string;
-  amount: number;
-  date: string;
-  currency: string;
-  is_fee: boolean;
-  fee: number;
-  hash: string;
-  txAddress: string;
-  fiatRate?: number | null;
-  fiatAmount?: number | null;
-};
 
 function groupBy(txList: TransactionInfo[], getKey: (item: TransactionInfo) => string): Map<string, TransactionInfo[]> {
   return txList.reduce((groupedItems: Map<string, TransactionInfo[]>, currentItem: TransactionInfo) => {
@@ -246,7 +237,7 @@ async function getBalance() {
   balance.value = parseInt(bal) / 1000000;
   client.disconnect();
   todaysRate.value = await getCurrentRipplePriceInAUD()
-  console.log("todaysRats", todaysRate.value)
+  console.log("todaysRate", todaysRate.value)
   return parseInt(bal) / 1000000;
 }
 
@@ -475,6 +466,19 @@ function addUserAddress() {
                   <AccountComponent :account="address"></AccountComponent>
                 </v-card-text>
               </v-card>
+              <br>
+              <v-card elevation="10">
+                <tokensComponent :address="address"></tokensComponent>
+              </v-card>
+              <br>
+              <v-card elevation="10">
+                <monthlyCashflow :tx-list="paymentsList" :direction="Direction.SENT"></monthlyCashflow>
+              </v-card>
+              <br>
+              <v-card elevation="10">
+                <monthlyCashflow :tx-list="paymentsList" :direction="Direction.RECEIVED"></monthlyCashflow>
+              </v-card>
+
             </div>
             <div v-else>
               <br>
